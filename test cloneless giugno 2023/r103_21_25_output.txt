@@ -1,0 +1,213 @@
+number of 0-1 variables:17346
+number of continous variables:38861
+number of constraints:339785
+objective function without service times at customers:1249.2075636322402
+objective function with service times at customers:1249.2075636322402
+time to solve:14401.17200000002
+solution status:Feasible
+0-------C1----C19----fictius
+0-------C2----C21----fictius
+0-------C3----C1----fictius
+0-------C4----C25----fictius
+0-------C5----C13----fictius
+0-------C6----C16----fictius
+0-------C7----C11----fictius
+0-------C8----C17----fictius
+0-------C9----C20----S3
+0-------C10----D10----fictius
+0-------C11----C9----fictius
+0-------C12----D8----fictius
+0-------C13----C6----fictius
+0-------C14----C15----S14
+0-------C15----C2----fictius
+0-------C16----C14----fictius
+0-------C17----C4----fictius
+0-------C18----C8----S9
+0-------C19----C7----fictius
+0-------C20----C10----fictius
+0-------C21----C22----fictius
+0-------C22----C23----fictius
+0-------C23----D14----fictius
+0-------C24----C12----fictius
+0-------C25----C24----fictius
+0-------D8----C3----fictius
+0-------D10----C5----fictius
+0-------D14----C18----fictius
+8-------D8----C3
+8-------C3----C1
+8-------C1----C19
+8-------C19----C7
+8-------C7----C11
+8-------C11----C9
+8-------C9----C20
+8-------C20----C10
+8-------C10----D10
+10-------D10----C5
+10-------C5----C13
+10-------C13----C6
+10-------C6----C16
+10-------C16----C14
+10-------C14----C15
+10-------C15----C2
+10-------C2----C21
+10-------C21----C22
+10-------C22----C23
+10-------C23----D14
+14-------D14----C18
+14-------C18----C8
+14-------C8----C17
+14-------C17----C4
+14-------C4----C25
+14-------C25----C24
+14-------C24----C12
+14-------C12----D8
+from C1 to C19 with stop at station fictius x value:1.0
+x_C1_C19_fictius
+ battery from C1 to C19:0.004291659749996839
+ time from C1 to C19:16.925280656738174
+ speed from C1 to C19:100.0
+from C2 to C21 with stop at station fictius x value:1.0
+x_C2_C21_fictius
+ battery from C2 to C21:0.0042643718599984295
+ time from C2 to C21:6.259216407509391
+ speed from C2 to C21:100.0
+from C3 to C1 with stop at station fictius x value:1.0
+x_C3_C1_fictius
+ battery from C3 to C1:0.004171272000000038
+ time from C3 to C1:8.729204114565976
+ speed from C3 to C1:100.0
+from C4 to C25 with stop at station fictius x value:1.0
+x_C4_C25_fictius
+ battery from C4 to C25:0.004021661702017551
+ time from C4 to C25:7.694151273839539
+ speed from C4 to C25:77.90332253808295
+from C5 to C13 with stop at station fictius x value:1.0
+x_C5_C13_fictius
+ battery from C5 to C13:0.004392785460086229
+ time from C5 to C13:9.479309920951597
+ speed from C5 to C13:100.00000000997139
+from C6 to C16 with stop at station fictius x value:1.0
+x_C6_C16_fictius
+ battery from C6 to C16:0.004351051039998433
+ time from C6 to C16:10.80807621990764
+ speed from C6 to C16:100.0
+from C7 to C11 with stop at station fictius x value:1.0
+x_C7_C11_fictius
+ battery from C7 to C11:0.004256346009996831
+ time from C7 to C11:8.992863000000007
+ speed from C7 to C11:100.0
+from C8 to C17 with stop at station fictius x value:1.0
+x_C8_C17_fictius
+ battery from C8 to C17:0.0036521850891023597
+ time from C8 to C17:26.0
+ speed from C8 to C17:32.11138560916458
+from C9 to C20 with stop at station S3 x value:1.0
+x_C9_C20_S3
+ battery from C9 to S3:0.004211401249996828
+ time from C9 to S3:5.122337010208494
+ speed from C9 to S3:100.0
+ battery from S3 to C20:0.004211401249996828
+ time from S3 to C20:4.943803203427859
+ speed from S3 to C20:100.0
+from C10 to D10 with stop at station fictius x value:1.0
+x_C10_D10_fictius
+ battery from C10 to D10:0.004171272000051277
+ time from C10 to D10:15.284927972355508
+ speed from C10 to D10:100.00000000618407
+from C11 to C9 with stop at station fictius x value:1.0
+x_C11_C9_fictius
+ battery from C11 to C9:0.004237083969996827
+ time from C11 to C9:21.196381365272003
+ speed from C11 to C9:100.0
+from C12 to D8 with stop at station fictius x value:1.0
+x_C12_D8_fictius
+ battery from C12 to D8:0.004171272000092582
+ time from C12 to D8:8.992862999000007
+ speed from C12 to D8:100.00000001051079
+from C13 to C6 with stop at station fictius x value:1.0
+x_C13_C6_fictius
+ battery from C13 to C6:0.004355866549998436
+ time from C13 to C6:4.239276273054399
+ speed from C13 to C6:100.0
+from C14 to C15 with stop at station S14 x value:1.0
+x_C14_C15_S14
+ battery from C14 to S14:0.004288449409998433
+ time from C14 to S14:7.017250850214255
+ speed from C14 to S14:100.0
+ battery from S14 to C15:0.004288449409998433
+ time from S14 to C15:2.4719016017139297
+ speed from S14 to C15:100.0
+from C15 to C2 with stop at station fictius x value:1.0
+x_C15_C2_fictius
+ battery from C15 to C2:0.004275608049998429
+ time from C15 to C2:7.793814600000005
+ speed from C15 to C2:100.0
+from C16 to C14 with stop at station fictius x value:1.0
+x_C16_C14_fictius
+ battery from C16 to C14:0.004320552809998435
+ time from C16 to C14:6.702884326780894
+ speed from C16 to C14:100.0
+from C17 to C4 with stop at station fictius x value:1.0
+x_C17_C4_fictius
+ battery from C17 to C4:0.00415834621729688
+ time from C17 to C4:34.000000000000114
+ speed from C17 to C4:89.96347723666909
+from C18 to C8 with stop at station S9 x value:1.0
+x_C18_C8_S9
+ battery from C18 to S9:0.004264371860001632
+ time from C18 to S9:1.3405768653561805
+ speed from C18 to S9:100.0
+ battery from S9 to C8:0.0042643718600016475
+ time from S9 to C8:4.943803203427766
+ speed from S9 to C8:100.00000000000179
+from C19 to C7 with stop at station fictius x value:1.0
+x_C19_C7_fictius
+ battery from C19 to C7:0.004264371859996827
+ time from C19 to C7:6.702884326780894
+ speed from C19 to C7:100.0
+from C20 to C10 with stop at station fictius x value:1.0
+x_C20_C10_fictius
+ battery from C20 to C10:0.004196954719996829
+ time from C20 to C10:9.479309921951595
+ speed from C20 to C10:100.0
+from C21 to C22 with stop at station fictius x value:1.0
+x_C21_C22_fictius
+ battery from C21 to C22:0.004246714989998429
+ time from C21 to C22:5.995242000000003
+ speed from C21 to C22:100.0
+from C22 to C23 with stop at station fictius x value:1.0
+x_C22_C23_fictius
+ battery from C22 to C23:0.004217821930000032
+ time from C22 to C23:6.702884326780894
+ speed from C22 to C23:100.0
+from C23 to D14 with stop at station fictius x value:1.0
+x_C23_D14_fictius
+ battery from C23 to D14:0.004171272000038542
+ time from C23 to D14:21.616152438815266
+ speed from C23 to D14:100.00000000437282
+from C24 to C12 with stop at station fictius x value:1.0
+x_C24_C12_fictius
+ battery from C24 to C12:0.0040520093517398235
+ time from C24 to C12:10.833722695579798
+ speed from C24 to C12:82.99084147364009
+from C25 to C24 with stop at station fictius x value:1.0
+x_C25_C24_fictius
+ battery from C25 to C24:0.004016405662659761
+ time from C25 to C24:11.472126030580549
+ speed from C25 to C24:78.40021291531392
+from D8 to C3 with stop at station fictius x value:1.0
+x_D8_C3_fictius
+ battery from D8 to C3:0.004192139210062111
+ time from D8 to C3:13.405768652561793
+ speed from D8 to C3:100.00000000705082
+from D10 to C5 with stop at station fictius x value:1.0
+x_D10_C5_fictius
+ battery from D10 to C5:0.004434519880065768
+ time from D10 to C5:12.359508007569648
+ speed from D10 to C5:100.0000000076477
+from D14 to C18 with stop at station fictius x value:1.0
+x_D14_C18_fictius
+ battery from D14 to C18:0.004283633900001638
+ time from D14 to C18:9.479309921951595
+ speed from D14 to C18:100.0
+number of vehicles used:3

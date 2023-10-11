@@ -1,0 +1,3 @@
+number of 0-1 variables:92715
+number of continous variables:206694
+number of constraints:1793872

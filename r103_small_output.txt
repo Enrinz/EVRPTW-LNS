@@ -1,0 +1,57 @@
+number of 0-1 variables:999
+number of continous variables:2206
+number of constraints:16654
+objective function without service times at customers:751.1217693886325
+objective function with service times at customers:751.1217693886325
+time to solve:62.17200000002049
+solution status:Optimal
+0-------C4----D6----fictius
+0-------C7----C20----fictius
+0-------C16----C4----fictius
+0-------C18----C7----fictius
+0-------C20----D5----fictius
+0-------D5----C16----fictius
+0-------D6----C18----fictius
+5-------D5----C16
+5-------C16----C4
+5-------C4----D6
+6-------D6----C18
+6-------C18----C7
+6-------C7----C20
+6-------C20----D5
+from C4 to D6 with stop at station fictius x value:1.0
+x_C4_D6_fictius
+ battery from C4 to D6:0.004171272000000042
+ time from C4 to D6:14.988105000000003
+ speed from C4 to D6:100.0
+from C7 to C20 with stop at station fictius x value:1.0
+x_C7_C20_fictius
+ battery from C7 to C20:0.0036069659689238615
+ time from C7 to C20:51.0
+ speed from C7 to C20:34.26791981162646
+from C16 to C4 with stop at station fictius x value:1.0
+x_C16_C4_fictius
+ battery from C16 to C4:0.004171272000000039
+ time from C16 to C4:26.978588999999992
+ speed from C16 to C4:100.0
+from C18 to C7 with stop at station fictius x value:1.0
+x_C18_C7_fictius
+ battery from C18 to C7:0.004193744380000038
+ time from C18 to C7:5.995242000000003
+ speed from C18 to C7:100.0
+from C20 to D5 with stop at station fictius x value:1.0
+x_C20_D5_fictius
+ battery from C20 to D5:0.004171272000000037
+ time from C20 to D5:18.95861984390319
+ speed from C20 to D5:100.0
+from D5 to C16 with stop at station fictius x value:1.0
+x_D5_C16_fictius
+ battery from D5 to C16:0.00420177023000004
+ time from D5 to C16:17.47898384997805
+ speed from D5 to C16:100.0
+from D6 to C18 with stop at station fictius x value:1.0
+x_D6_C18_fictius
+ battery from D6 to C18:0.00421300642000004
+ time from D6 to C18:9.479309921951595
+ speed from D6 to C18:100.0
+number of vehicles used:2

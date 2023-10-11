@@ -1,0 +1,63 @@
+Objective value:1114.1087396881526
+Final solution:
+X_C12_C14_fictius
+X_C6_C10_fictius
+X_C1_C12_fictius
+X_C11_C9_fictius
+X_C13_D1_fictius
+X_C7_D0_fictius
+X_C9_C8_fictius
+X_C8_D3_fictius
+X_C10_C3_fictius
+X_C4_C6_fictius
+X_C5_C7_fictius
+X_C2_C4_fictius
+X_C3_C5_fictius
+X_C25_C24_fictius
+X_C24_C20_fictius
+X_C21_C22_fictius
+X_C22_C25_fictius
+X_D3_C21_fictius
+X_C20_C2_fictius
+X_D0_C13_fictius
+X_C23_C1_fictius
+X_D1_C23_fictius
+X_C18_C17_fictius
+X_C17_C15_fictius
+X_C19_C18_fictius
+X_C14_C16_fictius
+X_C16_C19_fictius
+X_C15_C11_fictius
+Total time (in sec):3600.521
+Solution after final iteration
+Objective value:1114.1087396881526
+Solution:
+X_C12_C14_fictius
+X_C6_C10_fictius
+X_C1_C12_fictius
+X_C11_C9_fictius
+X_C13_D1_fictius
+X_C7_D0_fictius
+X_C9_C8_fictius
+X_C8_D3_fictius
+X_C10_C3_fictius
+X_C4_C6_fictius
+X_C5_C7_fictius
+X_C2_C4_fictius
+X_C3_C5_fictius
+X_C25_C24_fictius
+X_C24_C20_fictius
+X_C21_C22_fictius
+X_C22_C25_fictius
+X_D3_C21_fictius
+X_C20_C2_fictius
+X_D0_C13_fictius
+X_C23_C1_fictius
+X_D1_C23_fictius
+X_C18_C17_fictius
+X_C17_C15_fictius
+X_C19_C18_fictius
+X_C14_C16_fictius
+X_C16_C19_fictius
+X_C15_C11_fictius
+Total time (in sec) including the final iteration:3600.943
