@@ -56,7 +56,7 @@ public class matheuristic_k_degree_memory {
 
 int k, k_prime;
 //cloneless
-public cloneless_tech M; 
+public cloneless_tech2 M; 
 public PrintStream pr=null;
 public static PrintStream pr_out=null;
 public static PrintStream prRes=null;
@@ -108,13 +108,13 @@ int num_infeasibility, num_optimal, num_run;
 
 public matheuristic_k_degree_memory(String[] args) throws IOException {
 	
-	M=new cloneless_tech();
+	M=new cloneless_tech2();
 	M.num_veic=Integer.parseInt(args[4]);
 	if(args[2].contains("01"))
 		M.epsilon=0.1;
 	else
 		M.epsilon=1.0;
-	M.rho = Double.parseDouble(args[6]);
+	//M.rho = Double.parseDouble(args[6]);
 	k = Integer.parseInt(args[7]);
 	k_prime = Integer.parseInt(args[8]);
 	num_infeasibility = Integer.parseInt(args[10]);
@@ -302,9 +302,9 @@ public void feasible_arcs() {
 for(int j=1;j<M.N.length;j++) {
 	for(int i=1;i<M.N.length;i++) {
 		if(M.N[i].id.equals(M.N[j].id))continue;
-		if(!M.feasible_demands(i, j))continue;
-		if(!M.feasible_return_depot(i, j))continue;
-		if(!M.feasible_time_windows(i, j))continue;
+		//if(!M.feasible_demands(i, j))continue;
+		//if(!M.feasible_return_depot(i, j))continue;
+		//if(!M.feasible_time_windows(i, j))continue;
 
 		if(arcs_out.containsKey(M.N[i].id)) {
 			arcs_out.get(M.N[i].id).add(M.N[j].id);
@@ -3282,7 +3282,8 @@ public static void main(String[] args) throws IOException, IloException {
 	int count_run=0;
 	boolean changed=false;
 	
-	InstanceReaderGenerator ir = new InstanceReaderGenerator();
+	InstanceReaderGeneratorTech ir = new InstanceReaderGeneratorTech();
+
 	ir.generate(args);
 	
 	matheuristic_k_degree_memory mat=new matheuristic_k_degree_memory(args);
@@ -3292,8 +3293,8 @@ public static void main(String[] args) throws IOException, IloException {
 	mat.M.generate_distances();
 	mat.M.init_parameters(ir);
 	mat.M.compute_S();
-	mat.M.initVariables();
-	mat.M.initModel();
+	mat.M.initVariables_Ok();
+	//mat.M.initModel();
 	mat.feasible_arcs();
 
 	mat.M.timeLimit = Integer.parseInt(args[5]);

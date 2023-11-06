@@ -1,9 +1,0 @@
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c101_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c102_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c103_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c104_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c105_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c106_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c108_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg
-java -classpath cplex.jar;cloneless.jar cloneless_tech SGS c109_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 3 3600 24 8 1234 60 30 60 kdeg

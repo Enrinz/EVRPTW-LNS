@@ -1,6 +1,6 @@
 import ilog.concert.*;
 import ilog.cplex.IloCplex;
-
+import java.util.Random;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,7 +120,10 @@ public static double timeLimit = 3600.0;
 int conta_vincoli=0, conta_variabili_int, conta_variabili_cont=0;
 
 public ArrayList<XIndex>x_init=new ArrayList<XIndex>();
-
+/*
+ * calcola le distanze surrogate tra coppie di oggetti rappresentati 
+ * in N e le memorizza nella struttura dati surrogate_D. 
+ */
 public void compute_surrogate_distances() {
 	surrogate_D=new HashMap<String, HashMap<String, Double>>();
 	for(int i=0;i<N.length;i++) {
@@ -143,7 +146,42 @@ public void compute_surrogate_distances() {
 		}
 	}
 }
+public void printN() {
+	System.out.println("Clienti");
+    for (int i = 0; i < N.length; i++) {
+        System.out.println("N[" + i + "] = " + N[i]);
+    }
+}
 
+
+public void printN0() {
+	System.out.println("Clienti e depositi");
+	
+    for (int i = 0; i < N0.length; i++) {
+        System.out.println("N0[" + i + "] = " + N0[i]);
+    }
+}
+public void printN1() {
+	System.out.println("Tutti i nodi");
+    for (int i = 0; i < N1.length; i++) {
+        System.out.println("N1[" + i + "] = " + N1[i]);
+    }
+}
+public void printRS() {
+	System.out.println("Stazioni di ricarica");
+    for (int i = 0; i < RS.length; i++) {
+        System.out.println("RS[" + i + "] = " + RS[i]);
+    }
+}
+
+public void printXindici() {
+	System.out.println("Xindici: ");
+	for (XIndex xIndex : Xindici) {
+
+	    System.out.println(xIndex);
+	}
+
+}
 public boolean feasible_demands(node i, node j) {
 	if(i.id.contains("D"))
 		if(j.demand>Cl) 
@@ -1803,7 +1841,8 @@ public void initModelOneVeic(cloneless_tech2 jc, int trueNumVeic) throws IloExce
 }
 
 public void initiVariables() throws IloException {
-
+	System.out.println("#########################################");
+	System.out.println("initiVariables");
 	for(int ind=0;ind<Xindici.size();ind++) {
 		if(x.containsKey(Xindici.get(ind)))
 			continue;
@@ -2210,7 +2249,7 @@ public void solveRelaxation(String file_model) throws IloException, FileNotFound
 				model.add(conv);
 				XConv.put(varX.getKey(), conv);
 			}
-
+	
 	System.out.println("X var float ... risolvo rilassamento");
 	model.exportModel(name_model+"_RelKS_model.lp");
 	model.solve();
@@ -2220,20 +2259,19 @@ public void solveRelaxation(String file_model) throws IloException, FileNotFound
 
 public boolean solve(String file_model) throws IloException, FileNotFoundException {
 	//String name_model=file_model.replace(".txt", "");
-
 	model.setParam(IloCplex.Param.MIP.Tolerances.MIPGap,0.005);
 	//model.setParam(IloCplex.Param.MIP.Limits.Solutions,1);
-
+	
 	model.setOut(verbCloneless);
 	model.setWarning(verbCloneless);
-
+	
 	if(timeLimitMIPiter>0)
 		model.setParam(IloCplex.Param.TimeLimit,timeLimitMIPiter);
 	else {
 		if(timeLimit>0)
 			model.setParam(IloCplex.Param.TimeLimit, timeLimit);
 	}
-
+	
 		double cplexTime = model.getCplexTime();
 
 	//IloCplex.Status status = IloCplex.Status.Unknown; // ***
@@ -3365,6 +3403,119 @@ public void generate_nodes(InstanceReaderGeneratorTech ir) {
 	}
 	M=Dep[0].e*10;
 }
+/*
+ * calcola le distanze tra tutti gli elementi in questi insiemi
+ * N1 tutti i nodi di tipo: Dep (depositi), N (clienti) e RS (staz ricarica)
+ * 
+ */
+
+//cRandRemove: it randomly removes a certain number α of customers from the solution
+public void cRandRemove() {
+    Random random = new Random();
+    // Numero massimo di rotte da eliminare (adatta il valore a tua discrezione)
+    int alpha = 2;
+    int removed = 0;
+    // check che N sia inizializzata e contenga le tue rotte
+    if (N0 != null && N0.length > 0) {
+        while (removed != alpha) {
+            int indexDaEliminare = random.nextInt(N0.length);
+            System.out.println(indexDaEliminare);
+            if (N0[indexDaEliminare].id.startsWith("D")) continue;
+            else {
+                // Stampa la rotta eliminata
+            	System.out.println("Cliente eliminato: " + N0[indexDaEliminare]);
+            // Rimuovi la rotta dalla lista N e assegna il nuovo array a N0
+            N0 = removeRoute(N0, indexDaEliminare);
+            removed++;
+
+        }
+        }
+    }
+}
+//sRandRemove: it randomly removes a certain number α of RSs from the solution
+public void sRandRemove() {
+    Random random = new Random();
+    // Numero massimo di rotte da eliminare (adatta il valore a tua discrezione)
+    int alpha = 2;
+    int removed=0;
+    // check che N sia inizializzata e contenga le tue rotte
+    if (RS != null && RS.length > 0) {
+    	while (removed != alpha)  {
+            int indexDaEliminare = random.nextInt(RS.length);
+            
+            // Stampa la rotta eliminata
+            System.out.println("Stazione eliminata: " + RS[indexDaEliminare]);
+            
+            // Rimuovi la rotta dalla lista N
+            RS=removeRoute(RS, indexDaEliminare);
+            removed++;
+        }
+    }
+}
+//cCostRemove: it removes the first α customers who are farthest from the previous nodes
+public void cCostRemove(int alpha, int[] previousNodes) {
+    // check that N is initialized and contains your routes
+    if (N != null && N.length > 0) {
+        for (int i = 0; i < alpha; i++) {
+            int farthestCustomerIndex = findFarthestCustomer(previousNodes);
+            
+            if (farthestCustomerIndex == -1) {
+                // No more customers to remove
+                break;
+            }
+            
+            // Stampa la rotta eliminata
+            System.out.println("Cliente eliminato: " + N[farthestCustomerIndex].id);
+            
+            // Rimuovi la rotta dalla lista N
+            removeRoute(N, farthestCustomerIndex);
+        }
+    }
+}
+
+private int findFarthestCustomer(int[] previousNodes) {
+    if (N.length == 0 || previousNodes.length == 0) {
+        return -1; // No customer to remove
+    }
+
+    int farthestIndex = -1;
+    double maxDistance = -1;
+
+    for (int i = 0; i < N.length; i++) {
+        double distance = calculateDistance(N[i].id, previousNodes);
+        if (distance > maxDistance) {
+            maxDistance = distance;
+            farthestIndex = i;
+        }
+    }
+
+    return farthestIndex;
+}
+
+private double calculateDistance(String customerID, int[] previousNodes) {
+    double minDistance = Double.MAX_VALUE;
+    
+    for (int previousNode : previousNodes) {
+        double distance = D.get(N1[previousNode].id).get(customerID);
+        if (distance < minDistance) {
+            minDistance = distance;
+        }
+    }
+
+    return minDistance;
+}
+
+// Metodo per rimuovere una rotta da un array di tipo node[]
+private node[] removeRoute(node[] array, int index) {
+    if (index >= 0 && index < array.length) {
+        // Crea un nuovo array senza l'elemento da rimuovere
+        node[] newArray = new node[array.length - 1];
+        System.arraycopy(array, 0, newArray, 0, index);
+        System.arraycopy(array, index + 1, newArray, index, array.length - index - 1);
+        return newArray;
+    }
+    return array; // Restituisci l'array originale se l'indice è fuori dai limiti
+}
 
 public void generate_distances() {
 	N1=new node[Dep.length+N.length+RS.length];
@@ -3385,12 +3536,12 @@ public void generate_distances() {
 	for(int i=0;i<N1.length;i++) {
 		for(j=0;j<N1.length;j++) {
 			if(i!=j) {
-				double b=Math.pow((N1[i].x-N1[j].x), 2);
-				double c=Math.pow((N1[i].y-N1[j].y), 2);
-				double a=b+c;
+				double b=Math.pow((N1[i].x-N1[j].x), 2); //cateto1
+				double c=Math.pow((N1[i].y-N1[j].y), 2); //cateto2
+				double a=b+c; // per calcolo distanza euclidea
 				HashMap<String, Double> D_supp=new HashMap<String, Double>();
 								D_supp.put(N1[j].id, Math.sqrt(a));
-				if(D.containsKey(N1[i].id))
+				if(D.containsKey(N1[i].id))//se c'è già quella chiave, prende il valore relativo a quella chiave e lo mette in D
 					D.get(N1[i].id).put(N1[j].id,Math.sqrt(a));
 				else
 				{HashMap<String, Double> a_supp=new HashMap<String, Double>();
@@ -4052,7 +4203,7 @@ public void setWarmStart(int usedVeic) throws IloException {
 	}
 
 public static void main(String[] args) throws  IOException, IloException {
-	System.out.println("PROVA");
+	System.out.println("PROVA2");
 	InstanceReaderGeneratorTech ir = new InstanceReaderGeneratorTech();
 	ir.generate(args);
 	System.out.println("Cloneless tech 2");
@@ -4101,20 +4252,61 @@ public static void main(String[] args) throws  IOException, IloException {
 
 	if(true)
 	{ // cloneless tech 2 normale
+		System.out.println("Cloneless tech 2 standard");
+
 		jc.generate_nodes(ir);
+		
+		//************* START RandRemove *************
+		/*
+		jc.printN();
+		jc.cRandRemove();
+		jc.printN();
+		*/
+		System.out.println("***********************************************************");
+		
+		jc.printRS();
+		//jc.sRandRemove();
+		//jc.printRS();
+
+
+	
+		//*************  END  RandRemove *************	
+		
 		jc.generate_distances();
+		
+		
+		//************* START cCostRemove *************
+		
+        int alpha = 2; // You can adjust this value as needed
+        int[] previousNodes = {0, 1}; // Replace with the actual previous nodes
+        
+        // Call the cCostRemove function to remove customers
+        //jc.cCostRemove(alpha, previousNodes);
+        jc.printN();
+        
+        //*************  END  cCostRemove *************
+        
 		jc.init_parameters(ir);
+		
 		jc.compute_S();
+		
+
 		jc.model= new IloCplex();
 		jc.Cplex_time_spent=jc.model.getCplexTime();
+		
+	
+		
+		
 		jc.initVariables_Ok();
 		jc.initModel(jc);
 		//jc.model.exportModel("model_tech_4.lp");
+
 		jc.solve(args[0]);
 		jc.write_output(args[1], (args.length>=16? args[15] : ""), false);
 	}
 	else
 	{ // cloneless tech 2 con inizializzazione
+		System.out.print("Cloneless tech 2 con inizializzazione");
 		trueNumVeic = jc.num_veic;
 		int VeicoliSolInit = 0;
 

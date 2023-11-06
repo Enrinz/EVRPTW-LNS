@@ -35,7 +35,7 @@ public class InstanceReaderGeneratorTech {
 
     public  void generate(String[] paramArgs) throws IOException {
         if(paramArgs.length<13) {
-            System.out.println("Usage: InstanceReaderGenerator filetype input.txt techStat.txt parametri.txt SpeedApprx.txt " +
+            System.out.println("Usage			: InstanceReaderGenerator filetype input.txt techStat.txt parametri.txt SpeedApprx.txt " +
                     "numVeic tmax k k' seed timelimitKdeg TimelimitIter FinalTimelimit kdeg/CW noverb/verb");
             System.exit(0);
         }

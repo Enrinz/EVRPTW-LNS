@@ -1,18 +1,18 @@
-java -classpath C:\Program Files\IBM\ILOG\CPLEX_Studio_Community2211\cplex\lib\cplex.jar;ClonelessTech.jar cloneless_tech2 SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg
 
-C:\Program Files\IBM\ILOG\CPLEX_Studio_Community2211\cplex\lib\cplex.jar
+-Working in cartella:
+C:\Users\enrin\Desktop\EVRPTW-realistic\Realistic_EVRP_with_tech\test cloneless giugno 2023:
 
+***********************************************
+Make Jar: vai nella cartella bin
 
--Working: in cartella C:\Users\enrin\Desktop\EVRPTW-realistic\Realistic_EVRP_with_tech\test cloneless giugno 2023:
-
-
-java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio_Community2211\cplex\lib\cplex.jar";ClonelessTech.jar cloneless_tech2 SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg
-
-
--Questo
-java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar";ClonelessTech.jar cloneless_tech2 SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg
+premi su src->export->Java->Runnable jar file->.jar
 
 
+RUN:
 
-java -classpath "C:\Users\enrin\Desktop\EVRPTW-realistic\Realistic_EVRP_with_tech\test cloneless giugno 2023\cplex.jar";ClonelessTech.jar cloneless_tech2 SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg
+java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar";ClonelessTech1.jar cloneless_tech2 SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg
+
+
+java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar";ClonelessTech1.jar matheuristic_k_degree_hybridOneGenerator_tech SGS c107_5_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg
+
 

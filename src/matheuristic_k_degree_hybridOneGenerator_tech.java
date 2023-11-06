@@ -12,6 +12,7 @@ public class matheuristic_k_degree_hybridOneGenerator_tech {
 
 int k, k_prime;
 public cloneless_tech2 M;
+
 public PrintStream pr=null;
 public HashMap<String,ArrayList<String>> arcs_in=new HashMap<String,ArrayList<String>>();
 public HashMap<String,ArrayList<String>> arcs_out=new HashMap<String,ArrayList<String>>();
@@ -56,6 +57,7 @@ public ArrayList<XIndex> ZeroedXvar = new ArrayList<XIndex>();
 public matheuristic_k_degree_hybridOneGenerator_tech(String[] args) throws IOException {
 
 	M=new cloneless_tech2();
+
 	M.num_veic=Integer.parseInt(args[5]);
 	if(args[2].contains("01"))
 		M.epsilon=0.1;
@@ -255,7 +257,9 @@ public void probabilities_outgoing() throws UnknownObjectException, IloException
 public void feasible_arcs() {
 for(int j=0;j<M.N0.length;j++) {
 	for(int i=0;i<M.N0.length;i++) {
+
 		if(M.N0[i].id.startsWith("D")||M.N0[j].id.startsWith("D"))continue;
+
 		if(M.N0[i].id.equals(M.N0[j].id))continue;
 		if(!M.feasible_demands(M.N0[i], M.N0[j]))
 			{System.err.println("no feasible due to demand:"+M.N0[i]+","+M.N0[j]);
@@ -2236,13 +2240,12 @@ public void copy_opposite() throws UnknownObjectException, IloException {
 }
 
 public static void main(String[] args) throws IOException, IloException {
-	System.out.println("Prova");
-	System.out.println("Prova2");
+
 	double time_start=System.currentTimeMillis();
 	int count_infeasibility=0;
 	int count_optimal=0;
 	double current_objective=Double.POSITIVE_INFINITY;
-	double optimum_objective=Double.POSITIVE_INFINITY;
+	double optimum_objective=Double.POSITIVE_INFINITY;	
 	double current_objective_with_service_time=Double.POSITIVE_INFINITY;
 	double optimum_objective_with_service_time=Double.POSITIVE_INFINITY;
 	double time_to_best=0;
@@ -2258,7 +2261,6 @@ public static void main(String[] args) throws IOException, IloException {
 	
 	InstanceReaderGeneratorTech ir = new InstanceReaderGeneratorTech();
 	ir.generate(args);//il metodo di InstanceReaderGeneratorTech che prende in input il file dell'instanza
-	System.out.println(current_objective);
 	matheuristic_k_degree_hybridOneGenerator_tech mat=new matheuristic_k_degree_hybridOneGenerator_tech(args);
 	String name=args[1].replace(".txt", "");
 
@@ -2299,8 +2301,28 @@ public static void main(String[] args) throws IOException, IloException {
 		}
 		mat.M.RRT.put(stat,Rlist);
 	}
-
+	
+	//System.out.println("NODI INIZIALI"+mat.M.N);
+	
 	mat.M.generate_nodes(ir);
+	
+	//************* START cRandRemove *************
+	mat.M.printN0();
+	
+	mat.M.cRandRemove();
+	
+	mat.M.printN0();
+	
+	//*************  END  cRandRemove *************	
+	
+	//************* START sRandRemove *************
+	
+	mat.M.printRS();
+	mat.M.sRandRemove();
+	mat.M.printRS();
+	
+	//*************  END  sRandRemove *************	
+	
 	mat.M.generate_distances();
 	mat.M.init_parameters(ir);
 	mat.M.compute_S();
@@ -2309,7 +2331,7 @@ public static void main(String[] args) throws IOException, IloException {
 	mat.feasible_arcs();
 	mat.M.timeLimitMIPiter= 30;
 	mat.num_infeasibility = 2;
-	while(count_iteration_no_improved<num_iteration_no_improved) {
+	while(count_iteration_no_improved<num_iteration_no_improved) {//num=5
 	changed=false;
 	for(String st:mat.degree_in.keySet()) {
 		mat.degree_ingoing.put(st, mat.degree_in.get(st));
@@ -2328,15 +2350,17 @@ public static void main(String[] args) throws IOException, IloException {
 	mat.increasing_degree_outgoing();
 
 	mat.copy();
-
+	int counter=0;
 	while(!changed) {
+		System.out.println(counter);
+		counter++;
 	System.err.println("k':"+mat.k_prime);
 		System.out.println("deg in:"+mat.prob_ingoing);
 		System.out.println("deg out:"+mat.prob_outgoing);
 	mat.random_extract();
 		System.out.println("deg out:"+mat.random_outgoing.size()+" deging:"+mat.random_ingoing.size());
 	mat.set_zero_variables_outgoing();
-
+	
 	mat.M.solve(name+"_output_matheuristic"+mat.k_prime+".txt");
 	//mat.write_output(count_run);
 	if((mat.M.model.getStatus().equals(IloCplex.Status.Infeasible)||mat.M.model.getStatus().equals(IloCplex.Status.Unknown))&&count_infeasibility>=mat.num_infeasibility) {
@@ -2412,6 +2436,7 @@ public static void main(String[] args) throws IOException, IloException {
 	mat.restore_zero_variables_outgoing();
 	mat.reset();
 	mat.copy_opposite();
+	System.out.println("Run: "+count_run);
 	}
 	if(current_objective<optimum_objective) {
 		optimum_objective=current_objective;
