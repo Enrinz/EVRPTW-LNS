@@ -54,7 +54,7 @@ int num_infeasibility, num_optimal, num_run;
 
 public ArrayList<XIndex> ZeroedXvar = new ArrayList<XIndex>();
 
-public matheuristic_k_degree_hybridOneGenerator_tech(String[] args) throws IOException {
+public matheuristic_k_degree_hybridOneGenerator_tech(String[] args,long seed) throws IOException {
 
 	M=new cloneless_tech2();
 
@@ -73,9 +73,9 @@ public matheuristic_k_degree_hybridOneGenerator_tech(String[] args) throws IOExc
 	String name=args[1].replace(".txt", "");
 	pr=new PrintStream(new File(name+"_output_k_degree_matheuristic"+k_prime+".txt"));
 	//long seed = 0;
-	if(Long.parseLong(args[9])!=0) {
-		seed=Long.parseLong(args[9]);
-		pr.println("Seed: "+Long.parseLong(args[9]));
+	if(seed!=0) {//Long.parseLong(args[9])
+		//seed=Long.parseLong(args[9]);
+		pr.println("Seed: "+seed);
 		gen_ingoing=new Random(seed);
 	}
 	else {
@@ -2238,237 +2238,271 @@ public void copy_opposite() throws UnknownObjectException, IloException {
 		prob_outgoing_aus.put(cu, prob_outgoing_aus_1.get(cu));
 
 }
-
-public static void main(String[] args) throws IOException, IloException {
-
-	double time_start=System.currentTimeMillis();
-	int count_infeasibility=0;
-	int count_optimal=0;
-	double current_objective=Double.POSITIVE_INFINITY;
-	double optimum_objective=Double.POSITIVE_INFINITY;	
-	double current_objective_with_service_time=Double.POSITIVE_INFINITY;
-	double optimum_objective_with_service_time=Double.POSITIVE_INFINITY;
-	double time_to_best=0;
-	ArrayList<String> current_best_solution=new ArrayList<String>();
-	ArrayList<String> best_solution=new ArrayList<String>();
-	int best_iteration=0;
-	int best_k_prime=0;
-	int num_iteration_no_improved=5;//Integer.parseInt(args[13]);
-	int count_iteration_no_improved=0;
-	String current_best_status="";
-	int count_run=0;
-	boolean changed=false;
-	
-	InstanceReaderGeneratorTech ir = new InstanceReaderGeneratorTech();
-	ir.generate(args);//il metodo di InstanceReaderGeneratorTech che prende in input il file dell'instanza
-	matheuristic_k_degree_hybridOneGenerator_tech mat=new matheuristic_k_degree_hybridOneGenerator_tech(args);
-	String name=args[1].replace(".txt", "");
-
-	mat.M.R = new	RechargeTypes[ir.Inst.NumTechs];
-	for (int tec = 0; tec<ir.Inst.NumTechs;tec++){
-		mat.M.R[tec] = new RechargeTypes();
-		mat.M.R[tec].id=Integer.parseInt(ir.Inst.TechId[tec]);
-		mat.M.R[tec].description="Tec_"+tec;
-		mat.M.R[tec].cost = ir.Inst.EnCost[tec];
-		mat.M.R[tec].speed = ir.Inst.RecSpeed[tec];
-
-		if(ir.Inst.RecSpeed[tec] < mat.M.speed_min)// se la velocità di ricarica è < del minimo
-			mat.M.speed_min = ir.Inst.RecSpeed[tec];
-	}
-/*
- * Ciclo for che:
- * elabora dati all'interno di un'HashMap RSTech e crea una nuova 
- * struttura dati RRT contenente oggetti RechargeTypes associati 
- * a chiavi specifiche, basati su alcune condizioni e dati presenti 
- * in oggetti dell'oggetto ir.Inst.
- */
-	for(Map.Entry<String,ArrayList<String>> StaTec: ir.Inst.RSTech.entrySet())
-	{
-		String stat = StaTec.getKey();
-		ArrayList<RechargeTypes> Rlist = new ArrayList<>();
-		for (int tec=0;tec<StaTec.getValue().size();tec++) {
-			String tecId = StaTec.getValue().get(tec);
-			RechargeTypes Relem = new RechargeTypes();
-			Relem.id=Integer.parseInt(StaTec.getValue().get(tec));
-			for (int tt=0;tt<ir.Inst.TechId.length;tt++) {
-				if (ir.Inst.TechId[tt].equals(tecId)) {
-					Relem.speed = ir.Inst.RecSpeed[tt];
-					Relem.cost = ir.Inst.EnCost[tt];
-					Relem.description = "Tec_" + tt;
-					Rlist.add(Relem);
-				}
-			}
-		}
-		mat.M.RRT.put(stat,Rlist);
-	}
-	
-	//System.out.println("NODI INIZIALI"+mat.M.N);
-	
-	mat.M.generate_nodes(ir);
-	
-	//************* START cRandRemove *************
-	mat.M.printN0();
-	
-	mat.M.cRandRemove();
-	
-	mat.M.printN0();
-	
-	//*************  END  cRandRemove *************	
-	
-	//************* START sRandRemove *************
-	
-	mat.M.printRS();
-	mat.M.sRandRemove();
-	mat.M.printRS();
-	
-	//*************  END  sRandRemove *************	
-	
-	mat.M.generate_distances();
-	mat.M.init_parameters(ir);
-	mat.M.compute_S();
-	mat.M.initVariables_Ok();
-	mat.M.initModel(mat.M);
-	mat.feasible_arcs();
-	mat.M.timeLimitMIPiter= 30;
-	mat.num_infeasibility = 2;
-	while(count_iteration_no_improved<num_iteration_no_improved) {//num=5
-	changed=false;
-	for(String st:mat.degree_in.keySet()) {
-		mat.degree_ingoing.put(st, mat.degree_in.get(st));
-	}
-	for(String st:mat.degree_out.keySet()) {
-		mat.degree_outgoing.put(st, mat.degree_out.get(st));
-	}
-		System.out.println("** deg out:"+mat.degree_outgoing.size()+" deging:"+mat.degree_ingoing.size());
-	mat.pr.println("k':"+mat.k_prime);
-	mat.compute_start_ingoing_degree();
-	mat.compute_start_outgoing_degree();
-	
-	mat.probabilities();
-	
-	mat.increasing_degree_ingoing();
-	mat.increasing_degree_outgoing();
-
-	mat.copy();
-	int counter=0;
-	while(!changed) {
-		System.out.println(counter);
-		counter++;
-	System.err.println("k':"+mat.k_prime);
-		System.out.println("deg in:"+mat.prob_ingoing);
-		System.out.println("deg out:"+mat.prob_outgoing);
-	mat.random_extract();
-		System.out.println("deg out:"+mat.random_outgoing.size()+" deging:"+mat.random_ingoing.size());
-	mat.set_zero_variables_outgoing();
-	
-	mat.M.solve(name+"_output_matheuristic"+mat.k_prime+".txt");
-	//mat.write_output(count_run);
-	if((mat.M.model.getStatus().equals(IloCplex.Status.Infeasible)||mat.M.model.getStatus().equals(IloCplex.Status.Unknown))&&count_infeasibility>=mat.num_infeasibility) {
-		mat.k_prime+=2;
-		if(mat.k_prime/2>mat.k)break;
-		mat.pr.println("Reached the maximum number of consecutive infeasible iterations. New value for k prime:"+mat.k_prime);
-		changed=true;
-		count_run=0;
-		count_infeasibility=0;
-		count_optimal=0;
-	}
-	else {
-		if((mat.M.model.getStatus().equals(IloCplex.Status.Infeasible)||mat.M.model.getStatus().equals(IloCplex.Status.Unknown))&&count_infeasibility<mat.num_infeasibility) {
-			count_run++;
-			count_infeasibility++;
-			mat.pr.println("Again an infeasible: iteration"+count_infeasibility+ " with k':"+mat.k_prime);
-			if(count_run==mat.num_run)break;
-
-		}
-		else {
-			if((mat.M.model.getStatus().equals(IloCplex.Status.Optimal)||mat.M.model.getStatus().equals(IloCplex.Status.Feasible))&&current_objective<=mat.M.model.getObjValue()&&count_optimal>=mat.num_optimal) {
-				mat.k_prime+=2;
-				if(mat.k_prime/2>mat.k)break;
-				mat.pr.println("Reached the maximum number of consecutive iterations with the same incumbent. New value for k prime:"+mat.k_prime);
-				changed=true;
-				count_run=0;
-				count_infeasibility=0;
-				count_optimal=0;
-			}
-			else {
-				if((mat.M.model.getStatus().equals(IloCplex.Status.Optimal)||mat.M.model.getStatus().equals(IloCplex.Status.Feasible))&&current_objective<=mat.M.model.getObjValue()&&count_optimal<mat.num_optimal) {
-					count_run++;
-					count_optimal++;
-					count_infeasibility=0;
-					mat.pr.println("Again the same optimal solution:"+count_optimal+ " with k':"+mat.k_prime);
-					if(count_run==mat.num_run)break;
-
-
-				}
-				else {
-					if((mat.M.model.getStatus().equals(IloCplex.Status.Optimal)||mat.M.model.getStatus().equals(IloCplex.Status.Feasible))&&current_objective-mat.M.model.getObjValue()>Math.pow(10, -6)) {
-						count_run++;
-						count_optimal=0;
-						count_infeasibility=0;
-						current_objective=mat.M.model.getObjValue();
-						current_best_solution.clear();
-						best_iteration=count_run-1;
-						best_k_prime=mat.k_prime;
-						time_to_best=(System.currentTimeMillis()-time_start)/1000.00;
-
-						double obj=current_objective;
-						for(int i=1;i<mat.M.N.length;i++)
-							obj+=mat.M.FD*mat.M.N[i].service_time;
-						current_objective_with_service_time=obj;
-						current_best_status=mat.M.model.getStatus().toString();
-						for(XIndex na:mat.M.x.keySet()) {
-							if(mat.M.model.getValue(mat.M.x.get(na))>=0.99)
-								current_best_solution.add("customer "+na.xi+" customer "+na.xj+" station "+na.staz);
-						}
-
-						mat.pr.println("New incubent:"+current_objective+" obtained with k prime="+mat.k_prime+" after "+time_to_best+" seconds");
-						System.err.println("New incubent:"+current_objective+" obtained with k prime="+mat.k_prime+" after "+time_to_best+" seconds");
-
-						if(count_run==mat.num_run)break;
-
-
-							}
-					}
-				
-			}
-		}
-	}
-	mat.restore_zero_variables_outgoing();
-	mat.reset();
-	mat.copy_opposite();
-	System.out.println("Run: "+count_run);
-	}
-	if(current_objective<optimum_objective) {
-		optimum_objective=current_objective;
-		optimum_objective_with_service_time=current_objective_with_service_time;
-		best_solution.clear();
-		for(String st:current_best_solution) {
-			best_solution.add(st);
-		}
-		count_iteration_no_improved=0;
-	}
-	else
-		if(current_objective>optimum_objective)
-			count_iteration_no_improved=0;
-		else
-			count_iteration_no_improved++;
-	if(mat.k_prime/2>=mat.k)break;
-	}
-	mat.pr.println("Condition to end:");
-	if(count_iteration_no_improved==num_iteration_no_improved)
-		mat.pr.println("Reached the maximum number of consecutive iterations without improving the objective");
-	else
-		mat.pr.println("Reached k'/2 "+mat.k_prime/2+" and k "+mat.k);
-	time_start=(System.currentTimeMillis()-time_start)/1000.00;
-	mat.pr.println("Time to solve:"+time_start+ " seconds");
-	mat.pr.println("Best solution obtained at run "+best_iteration+" with k'="+best_k_prime+ " obtained after "+time_to_best+ " seconds");
-	mat.pr.println("Status:"+current_best_status);
-	mat.pr.println("Objective function:"+current_objective);
-	mat.pr.println("Objective function with service times:"+current_objective_with_service_time);
-	mat.pr.println("Routing variables equal to 1:");
-	for(String st:current_best_solution)
-		mat.pr.println(st);
-	mat.pr.close();
-}
+//
+//public static void main(String[] args) throws IOException, IloException {
+//
+//	double time_start=System.currentTimeMillis();
+//	int count_infeasibility=0;
+//	int count_optimal=0;
+//	double current_objective=Double.POSITIVE_INFINITY;
+//	double optimum_objective=Double.POSITIVE_INFINITY;	
+//	double current_objective_with_service_time=Double.POSITIVE_INFINITY;
+//	double optimum_objective_with_service_time=Double.POSITIVE_INFINITY;
+//	double time_to_best=0;
+//	ArrayList<String> current_best_solution=new ArrayList<String>();
+//	ArrayList<String> best_solution=new ArrayList<String>();
+//	int best_iteration=0;
+//	int best_k_prime=0;
+//	int num_iteration_no_improved=5;//Integer.parseInt(args[13]);
+//	int count_iteration_no_improved=0;
+//	String current_best_status="";
+//	int count_run=0;
+//	boolean changed=false;
+//	
+//	InstanceReaderGeneratorTech ir = new InstanceReaderGeneratorTech();
+//	ir.generate(args);//il metodo di InstanceReaderGeneratorTech che prende in input il file dell'instanza
+//	matheuristic_k_degree_hybridOneGenerator_tech mat=new matheuristic_k_degree_hybridOneGenerator_tech(args);
+//	String name=args[1].replace(".txt", "");
+//
+//	mat.M.R = new	RechargeTypes[ir.Inst.NumTechs];
+//	for (int tec = 0; tec<ir.Inst.NumTechs;tec++){
+//		mat.M.R[tec] = new RechargeTypes();
+//		mat.M.R[tec].id=Integer.parseInt(ir.Inst.TechId[tec]);
+//		mat.M.R[tec].description="Tec_"+tec;
+//		mat.M.R[tec].cost = ir.Inst.EnCost[tec];
+//		mat.M.R[tec].speed = ir.Inst.RecSpeed[tec];
+//
+//		if(ir.Inst.RecSpeed[tec] < mat.M.speed_min)// se la velocità di ricarica è < del minimo
+//			mat.M.speed_min = ir.Inst.RecSpeed[tec];
+//	}
+///*
+// * Ciclo for che:
+// * elabora dati all'interno di un'HashMap RSTech e crea una nuova 
+// * struttura dati RRT contenente oggetti RechargeTypes associati 
+// * a chiavi specifiche, basati su alcune condizioni e dati presenti 
+// * in oggetti dell'oggetto ir.Inst.
+// */
+//	for(Map.Entry<String,ArrayList<String>> StaTec: ir.Inst.RSTech.entrySet())
+//	{
+//		String stat = StaTec.getKey();
+//		ArrayList<RechargeTypes> Rlist = new ArrayList<>();
+//		for (int tec=0;tec<StaTec.getValue().size();tec++) {
+//			String tecId = StaTec.getValue().get(tec);
+//			RechargeTypes Relem = new RechargeTypes();
+//			Relem.id=Integer.parseInt(StaTec.getValue().get(tec));
+//			for (int tt=0;tt<ir.Inst.TechId.length;tt++) {
+//				if (ir.Inst.TechId[tt].equals(tecId)) {
+//					Relem.speed = ir.Inst.RecSpeed[tt];
+//					Relem.cost = ir.Inst.EnCost[tt];
+//					Relem.description = "Tec_" + tt;
+//					Rlist.add(Relem);
+//				}
+//			}
+//		}
+//		mat.M.RRT.put(stat,Rlist);
+//	}
+//	
+//	
+//	mat.M.generate_nodes(ir);
+//	
+//	//************* START cRandRemove *************
+//	
+//	/*
+//	mat.M.printN0();
+//	
+//	mat.M.cRandRemove();
+//	
+//	mat.M.printN0();
+//	*/
+//	
+//	//*************  END  cRandRemove *************	
+//	
+//	//************* START sRandRemove *************
+//	
+//	/*	
+//	mat.M.printRS();
+//	mat.M.sRandRemove();
+//	mat.M.printRS();
+//	*/
+//	
+//	//*************  END  sRandRemove *************	
+//
+//	
+//	mat.M.generate_distances();
+//	mat.M.init_parameters(ir);
+//	mat.M.compute_S();
+//	mat.M.initVariables_Ok();
+//	mat.M.initModel(mat.M);
+//	mat.feasible_arcs();
+//	mat.M.timeLimitMIPiter= 30;
+//	mat.num_infeasibility = 2;
+//	
+//	
+//	
+//	
+//	//considera codice fin qui 
+//	
+//	while(count_iteration_no_improved<num_iteration_no_improved) {//num max=5
+//	changed=false;
+//
+//	//NEW CODE
+//	
+//	/*
+//	System.out.println("**** CHECK NODES N0 INIZIALI ****");
+//	mat.M.printN0();
+//	mat.M.cRandRemove();
+//	System.out.println("**** CHECK NODES N0 POST cRandRemove ****");
+//	mat.M.printN0();
+//
+//	*/
+//	//END NEW CODE
+//
+//
+//	
+//	for(String st:mat.degree_in.keySet()) {
+//		mat.degree_ingoing.put(st, mat.degree_in.get(st));
+//	}
+//	for(String st:mat.degree_out.keySet()) {
+//		mat.degree_outgoing.put(st, mat.degree_out.get(st));
+//	}
+//		System.out.println("** deg out size:"+mat.degree_outgoing.size()+" deging size:"+mat.degree_ingoing.size());
+//		System.out.println("** deg out:"+mat.degree_outgoing+" deging:"+mat.degree_ingoing);
+//	mat.pr.println("k':"+mat.k_prime);
+//	mat.compute_start_ingoing_degree();
+//	mat.compute_start_outgoing_degree();
+//	
+//	mat.probabilities();
+//	
+//	mat.increasing_degree_ingoing();
+//	mat.increasing_degree_outgoing();
+//
+//	mat.copy();
+//	int counter=0;
+//	while(!changed) {
+//		
+//		//NEW CODE
+//		
+//
+//
+//		
+//		//END NEW CODE
+//		System.out.println("*******COUNTER*******"+counter);
+//		counter++;
+//	System.err.println("k':"+mat.k_prime);
+//		System.out.println("deg in:"+mat.prob_ingoing);
+//		System.out.println("deg out:"+mat.prob_outgoing);
+//	mat.random_extract();
+//		System.out.println("deg out:"+mat.random_outgoing.size()+" deging:"+mat.random_ingoing.size());
+//	mat.set_zero_variables_outgoing();
+//	
+//	mat.M.solve(name+"_output_matheuristic"+mat.k_prime+".txt");
+//	//mat.write_output(count_run);
+//	if((mat.M.model.getStatus().equals(IloCplex.Status.Infeasible)||mat.M.model.getStatus().equals(IloCplex.Status.Unknown))&&count_infeasibility>=mat.num_infeasibility) {
+//		mat.k_prime+=2;
+//		if(mat.k_prime/2>mat.k)break;
+//		mat.pr.println("Reached the maximum number of consecutive infeasible iterations. New value for k prime:"+mat.k_prime);
+//		changed=true;
+//		count_run=0;
+//		count_infeasibility=0;
+//		count_optimal=0;
+//	}
+//	else {
+//		if((mat.M.model.getStatus().equals(IloCplex.Status.Infeasible)||mat.M.model.getStatus().equals(IloCplex.Status.Unknown))&&count_infeasibility<mat.num_infeasibility) {
+//			count_run++;
+//			count_infeasibility++;
+//			mat.pr.println("Again an infeasible: iteration"+count_infeasibility+ " with k':"+mat.k_prime);
+//			if(count_run==mat.num_run)break;
+//
+//		}
+//		else {
+//			if((mat.M.model.getStatus().equals(IloCplex.Status.Optimal)||mat.M.model.getStatus().equals(IloCplex.Status.Feasible))&&current_objective<=mat.M.model.getObjValue()&&count_optimal>=mat.num_optimal) {
+//				mat.k_prime+=2;
+//				if(mat.k_prime/2>mat.k)break;
+//				mat.pr.println("Reached the maximum number of consecutive iterations with the same incumbent. New value for k prime:"+mat.k_prime);
+//				changed=true;
+//				count_run=0;
+//				count_infeasibility=0;
+//				count_optimal=0;
+//			}
+//			else {
+//				if((mat.M.model.getStatus().equals(IloCplex.Status.Optimal)||mat.M.model.getStatus().equals(IloCplex.Status.Feasible))&&current_objective<=mat.M.model.getObjValue()&&count_optimal<mat.num_optimal) {
+//					count_run++;
+//					count_optimal++;
+//					count_infeasibility=0;
+//					mat.pr.println("Again the same optimal solution:"+count_optimal+ " with k':"+mat.k_prime);
+//					if(count_run==mat.num_run)break;
+//
+//
+//				}
+//				else {
+//					if((mat.M.model.getStatus().equals(IloCplex.Status.Optimal)||mat.M.model.getStatus().equals(IloCplex.Status.Feasible))&&current_objective-mat.M.model.getObjValue()>Math.pow(10, -6)) {
+//						count_run++;
+//						count_optimal=0;
+//						count_infeasibility=0;
+//						current_objective=mat.M.model.getObjValue();
+//						current_best_solution.clear();
+//						best_iteration=count_run-1;
+//						best_k_prime=mat.k_prime;
+//						time_to_best=(System.currentTimeMillis()-time_start)/1000.00;
+//
+//						double obj=current_objective;
+//						for(int i=1;i<mat.M.N.length;i++)
+//							obj+=mat.M.FD*mat.M.N[i].service_time;
+//						current_objective_with_service_time=obj;
+//						current_best_status=mat.M.model.getStatus().toString();
+//						for(XIndex na:mat.M.x.keySet()) {
+//							if(mat.M.model.getValue(mat.M.x.get(na))>=0.99)
+//								current_best_solution.add("customer "+na.xi+" customer "+na.xj+" station "+na.staz);
+//						}
+//
+//						mat.pr.println("New incubent:"+current_objective+" obtained with k prime="+mat.k_prime+" after "+time_to_best+" seconds");
+//						System.err.println("New incubent:"+current_objective+" obtained with k prime="+mat.k_prime+" after "+time_to_best+" seconds");
+//
+//						if(count_run==mat.num_run)break;
+//
+//
+//							}
+//					}
+//				
+//			}
+//		}
+//	}
+//	mat.restore_zero_variables_outgoing();
+//	mat.reset();
+//	mat.copy_opposite();
+//	System.out.println("Run: "+count_run);
+//	}
+//	if(current_objective<optimum_objective) {
+//		optimum_objective=current_objective;
+//		optimum_objective_with_service_time=current_objective_with_service_time;
+//		best_solution.clear();
+//		for(String st:current_best_solution) {
+//			best_solution.add(st);
+//		}
+//		count_iteration_no_improved=0;
+//	}
+//	else
+//		if(current_objective>optimum_objective)
+//			count_iteration_no_improved=0;
+//		else
+//			count_iteration_no_improved++;
+//	if(mat.k_prime/2>=mat.k)break;
+//	}
+//	mat.pr.println("Condition to end:");
+//	if(count_iteration_no_improved==num_iteration_no_improved)
+//		mat.pr.println("Reached the maximum number of consecutive iterations without improving the objective");
+//	else
+//		mat.pr.println("Reached k'/2 "+mat.k_prime/2+" and k "+mat.k);
+//	time_start=(System.currentTimeMillis()-time_start)/1000.00;
+//	mat.pr.println("Time to solve:"+time_start+ " seconds");
+//	mat.pr.println("Best solution obtained at run "+best_iteration+" with k'="+best_k_prime+ " obtained after "+time_to_best+ " seconds");
+//	mat.pr.println("Status:"+current_best_status);
+//	mat.pr.println("Objective function:"+current_objective);
+//	mat.pr.println("Objective function with service times:"+current_objective_with_service_time);
+//	mat.pr.println("Routing variables equal to 1:");
+//	for(String st:current_best_solution)
+//		mat.pr.println(st);
+//	mat.pr.close();
+//}
 
 }

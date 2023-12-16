@@ -1,6 +1,6 @@
 Seed: 1234
 k':8
-New incubent:1633.7922214033044 obtained with k prime=8 after 31.085 seconds
+New incubent:1251.6899196018207 obtained with k prime=8 after 30.938 seconds
 Reached the maximum number of consecutive iterations with the same incumbent. New value for k prime:10
 k':10
 Reached the maximum number of consecutive iterations with the same incumbent. New value for k prime:12
@@ -14,38 +14,37 @@ k':18
 Reached the maximum number of consecutive iterations with the same incumbent. New value for k prime:20
 Condition to end:
 Reached the maximum number of consecutive iterations without improving the objective
-Time to solve:212.075 seconds
-Best solution obtained at run 0 with k'=8 obtained after 31.085 seconds
+Time to solve:212.173 seconds
+Best solution obtained at run 0 with k'=8 obtained after 30.938 seconds
 Status:Feasible
-Objective function:1633.7922214033044
-Objective function with service times:2281.792221403304
+Objective function:1251.6899196018207
+Objective function with service times:1899.6899196018207
 Routing variables equal to 1:
 customer C10 customer C11 station fictius
-customer C9 customer C13 station fictius
-customer C12 customer C16 station fictius
-customer C23 customer C1 station fictius
-customer C22 customer D4 station fictius
-customer C11 customer C8 station fictius
-customer C14 customer C9 station fictius
-customer C8 customer D0 station fictius
+customer C12 customer C14 station fictius
+customer C24 customer C1 station fictius
+customer C11 customer C9 station fictius
+customer C13 customer D9 station fictius
+customer C9 customer C8 station fictius
 customer C4 customer C6 station fictius
 customer C6 customer C7 station fictius
-customer C5 customer D1 station fictius
 customer C7 customer C3 station fictius
 customer C1 customer C2 station fictius
 customer C2 customer C4 station fictius
 customer C3 customer C5 station fictius
-customer C25 customer C12 station fictius
-customer C24 customer C25 station fictius
-customer C21 customer C22 station fictius
-customer C20 customer C21 station fictius
-customer C13 customer D12 station fictius
-customer D4 customer C23 station fictius
-customer D0 customer C24 station fictius
-customer D1 customer C20 station fictius
-customer D12 customer C14 station S9
+customer D10 customer C20 station fictius
+customer C25 customer C18 station fictius
+customer C21 customer C23 station fictius
+customer C20 customer C22 station fictius
+customer C23 customer C12 station fictius
+customer C22 customer C25 station fictius
+customer C8 customer D12 station fictius
+customer D9 customer C21 station fictius
+customer C5 customer D10 station fictius
+customer D12 customer C24 station S9
 customer C18 customer C17 station fictius
-customer C17 customer C15 station fictius
-customer C19 customer C18 station fictius
+customer C17 customer C10 station fictius
+customer C19 customer C15 station fictius
+customer C14 customer C16 station fictius
 customer C16 customer C19 station fictius
-customer C15 customer C10 station fictius
+customer C15 customer C13 station fictius
