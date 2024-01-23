@@ -1,5 +1,7 @@
 import ilog.concert.*;
 import ilog.cplex.IloCplex;
+import ilog.cplex.IloCplex.UnknownObjectException;
+
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.io.*;
@@ -26,6 +28,88 @@ electric vehicle routing problem with time windows"
 
 
 public class cloneless_tech2 {
+
+	    
+    public static List<List<String>> buildRoutes(List<List<String>> routes) {
+        Map<String, List<String>> graph = new HashMap<>();
+
+        // Costruisci il grafo
+        for (List<String> route : routes) {
+            String node1 = route.get(0);
+            String node2 = route.get(1);
+
+            addEdge(graph, node1, node2);
+            addEdge(graph, node2, node1);
+        }
+
+        List<List<String>> resultRoutes = new ArrayList<>();
+
+        // Per ogni deposito D, costruisci una rotta
+        for (String depot : graph.keySet()) {
+            List<String> route = new ArrayList<>();
+            buildRoute(graph, depot, depot, route);
+            resultRoutes.add(route);
+        }
+
+        return resultRoutes;
+    }
+
+    private static void buildRoute(Map<String, List<String>> graph, String current, String start, List<String> route) {
+        route.add(current);
+        List<String> neighbors = graph.get(current);
+
+        if (neighbors != null) {
+            for (String neighbor : neighbors) {
+                if (!route.contains(neighbor) && !neighbor.equals(start)) {
+                    buildRoute(graph, neighbor, start, route);
+                }
+            }
+        }
+    }
+
+    private static void addEdge(Map<String, List<String>> graph, String node1, String node2) {
+        if (!graph.containsKey(node1)) {
+            graph.put(node1, new ArrayList<>());
+        }
+        graph.get(node1).add(node2);
+    }
+    
+    public static List<List<String>> SO(Map<XIndex, IloNumVar> SolCurr) {
+        List<List<String>> routes = new ArrayList<>();
+
+        for (IloNumVar value : SolCurr.values()) {
+            // Ottieni il nome della variabile come stringa
+            String varName = value.getName();
+
+            // Estrai le informazioni necessarie dalla stringa del nome
+            String[] parts = varName.split("_");
+            String C = parts[1]; // Parte relativa a C
+            String D = parts[2]; // Parte relativa a D
+
+            // Aggiungi le informazioni correnti alla route corrente
+            List<String> currentRoute = new ArrayList<>();
+            currentRoute.add(C);
+            currentRoute.add(D);
+
+            // Aggiungi la route corrente a routes
+            routes.add(currentRoute);
+        }
+
+        return routes;
+    }
+    public static List<List<String>> filterDepotToDepotEdges(List<List<String>> routes) {
+        List<List<String>> result = new ArrayList<>();
+
+        for (List<String> edge : routes) {
+            // Verifica se l'arco inizia da un deposito "D" e termina in un deposito "D"
+            if (edge.size() >= 2 && edge.get(0).startsWith("D") && edge.get(edge.size() - 1).startsWith("D")) {
+                result.add(edge);
+            }
+        }
+
+        return result;
+    }
+    
 	matheuristic_k_degree_hybridOneGenerator_tech kDegree;
 	public ArrayList<XIndex> ZeroedXvar = new ArrayList<XIndex>();
 	long TempoCPU = 0;
@@ -4599,13 +4683,16 @@ public static node[] sortNodesByDemandDescending(node[] originalNodes) {
 
     return sortedNodes;
 }
-private static Map<XIndex, IloNumVar> destroySolution(Imp2HybridRKS_tech ks, Map<XIndex, IloNumVar> SolCurr, int alpha, node[] RS, node[] N,  node[] N1HighestDemand, List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove) {
+private static Map<XIndex, IloNumVar> destroySolution(Imp2HybridRKS_tech ks, Map<XIndex, IloNumVar> SolCurr, int alpha, node[] RS, node[] N,  node[] N1HighestDemand, List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove,List<List<String>> resultRoutes) throws UnknownObjectException, IloException {
     // Randomly pick a move among sRandRemove, cRandRemove, cLoadRemove
-    String[] moves = {"sRandRemove", "cRandRemove", "cLoadRemove"};
+    String[] moves = { "cRandRemove", "cLoadRemove","cLessCustomers"}; //"sRandRemove",
     String selectedMove = moves[new Random().nextInt(moves.length)];
 
     // Assign the selected move to Sol1
     Map<XIndex, IloNumVar> Sol1 = null; // Initialize Sol1 as needed
+
+    //TEST, to comment:
+    //selectedMove="cLessCustomers";
 
     System.out.println("Applying destroy");
     switch (selectedMove) {
@@ -4620,6 +4707,10 @@ private static Map<XIndex, IloNumVar> destroySolution(Imp2HybridRKS_tech ks, Map
         case "cLoadRemove":
             System.out.println("cLoadRemove");
             Sol1 = ks.cLoadRemove(SolCurr, alpha, N1HighestDemand, entriesAndValuesToRemove);
+            break;
+        case "cLessCustomers":
+            System.out.println("cLessCustomers");
+            Sol1 = ks.cLessCustomers(SolCurr,resultRoutes);
             break;
         default:
             // Handle unexpected case (if needed)
@@ -4637,9 +4728,9 @@ private static Map<XIndex, IloNumVar> destroySolution(Imp2HybridRKS_tech ks, Map
 
 private static void repairSolution(Imp2HybridRKS_tech ks, String fileModel, double maxTimeSeconds,List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove)throws FileNotFoundException {
     try {
-    	ks.kDegree.M.add_UB_pre_repair_constraint(entriesAndValuesToRemove);
+    	//ks.kDegree.M.add_UB_pre_repair_constraint(entriesAndValuesToRemove);
     	//ks.kDegree.M.delete_constraint_UB();
-        ks.kDegree.M.model.setParam(IloCplex.Param.TimeLimit, maxTimeSeconds);//100seconds
+        //ks.kDegree.M.model.setParam(IloCplex.Param.TimeLimit, maxTimeSeconds);//100seconds
         System.out.println("Applying repair for: "+maxTimeSeconds+" seconds");
         ks.kDegree.M.solve(fileModel);
         //ks.kDegree.M.delete_constraint_UB(entriesAndValuesToRemove);
@@ -4856,48 +4947,6 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	printWriter.println("Solution Status:"+ks.kDegree.M.model.getStatus());
 	
 
-	//System.out.println("Solution X:"+ks.kDegree.M.x.entrySet());
-//	
-//	System.out.println("x (length: " + ks.kDegree.M.x.size() + "):");
-//    System.out.println("x:");
-//    for (Map.Entry<XIndex, IloNumVar> entry : ks.kDegree.M.x.entrySet()) {
-//        XIndex key = entry.getKey();
-//        IloNumVar value = entry.getValue();
-//        
-//        System.out.println("Key: " + key + ", Value: " + value);
-//    }
-//        
-//	for(XIndex pippo :ks.kDegree.M.x.keySet()) {		
-//		System.out.println(ks.kDegree.M.model.getValue(ks.kDegree.M.x.get(pippo))>=0.99);	
-//	}
-	
-	
-	//PRINT CURRENT SOLUTION
-	
-//	System.out.println("Current Solution");
-//	for (Map.Entry<XIndex, IloNumVar> entry : ks.kDegree.M.x.entrySet()) {
-//	    XIndex key = entry.getKey();
-//	    IloNumVar value = entry.getValue();
-//
-//	    double variableValue = ks.kDegree.M.model.getValue(value);
-//	    if (variableValue >= 0.99) {
-//	        System.out.println("Key: " + key + ", Value: " + value + ", Type: " + value.getClass().getName());
-//
-//	    }
-//	}
-	
-	//END PRINT CURRENT SOLUTION
-	
-	
-//		System.out.println("solution status:"+jc.model.getStatus());
-//		for(XIndex pippo :jc.x.keySet()) {
-//			
-//			
-//			System.out.println(jc.model.getValue(jc.x.get(pippo))>=0.99);
-//		}
-	
-	
-
 	
 
 	Map<XIndex, IloNumVar> SolCurr = new HashMap<>();
@@ -4914,28 +4963,14 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	double GapCurr=0;
 	double GapBest=0;
 	
-//	List<String> nodeIDs = new ArrayList<>();
-//
-//	for (Map.Entry<XIndex, IloNumVar> entry : ks.kDegree.M.x.entrySet()) {
-//	    XIndex key = entry.getKey();
-//	    IloNumVar value = entry.getValue();	    
-//	    double variableValue = ks.kDegree.M.model.getValue(value);
-//	    
-//	    if (variableValue >= 0.99) {
-//	        String nodeID = extractNodeID(value);
-//	        System.out.println("Key: " + key + ", Value: " + value + ", Node ID: " + nodeID);
-//
-//	        // Add the extracted node ID to the list
-//	        nodeIDs.add(nodeID);
-//	    }
-//	}
-//	
+	
 	//Start lns code
 	
 	Double Zcurr=10000.0;
 	Double Tcurr=T0;
 	
 	Map<XIndex, IloNumVar> SolBest=SolCurr; //soluzione inziale
+	
 	Double Zbest=ks.kDegree.M.model.getObjValue();
 	Zcurr=Zbest;
 	Map<XIndex, IloNumVar> Sol1=new HashMap<>();
@@ -4943,7 +4978,24 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	int iteration=1;
 //	System.out.println("Full Model:");
 //	System.out.println(ks.kDegree.M.model);
+	
+	
+    List<List<String>> routes = SO(SolCurr);
 
+    // Stampa il risultato
+    System.out.println("Routes: " + routes);
+    
+    List<List<String>> result = filterDepotToDepotEdges(routes);
+
+    // Stampa il risultato
+    System.out.println("Filtered Routes: " + result);
+    //QUESTA
+    List<List<String>> resultRoutes = buildRoutes(routes);
+
+    // Stampa le rotte
+    for (List<String> route : resultRoutes) {
+        System.out.println("Route: " + route);
+    }
 	System.out.println("Initial Solution: "+SolCurr+" Initial Objective Function: "+Zcurr);
 	printWriter.println("Initial Solution: "+SolCurr+" Initial Objective Function: "+Zcurr);
 	
@@ -4951,13 +5003,30 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	long startTime = System.currentTimeMillis();
 	long totalTimeLimit = (long) ((TT-Tini)*1000); 
 	
+	
+
+
+	//if(!init)
+
 	while (System.currentTimeMillis() - startTime < totalTimeLimit) {
-	    
+		
+		double obj=ks.kDegree.M.model.getObjValue();
+		double objcompleto = obj;
+		for(int i=0;i<N.length;i++)
+			objcompleto+=ks.kDegree.M.FD*N[i].service_time;
+
+		System.out.println("Obj: "+obj+"; Completo: "+objcompleto+" LB: "+ks.kDegree.M.model.getBestObjValue()+";gap: "+ ks.kDegree.M.model.getMIPRelativeGap()+";CostoVeicoli: "+
+				ks.kDegree.M.model.getValue(ks.kDegree.M.CostoVeicoli)+";CostoEnergia: "+ks.kDegree.M.model.getValue(ks.kDegree.M.CostoEnergia)+";CostoDrivers: "+ks.kDegree.M.model.getValue(ks.kDegree.M.CostoDrivers));
+		printWriter.println("Obj: "+obj+"; Completo: "+objcompleto+" LB: "+ks.kDegree.M.model.getBestObjValue()+";gap: "+ ks.kDegree.M.model.getMIPRelativeGap()+";CostoVeicoli: "+
+				ks.kDegree.M.model.getValue(ks.kDegree.M.CostoVeicoli)+";CostoEnergia: "+ks.kDegree.M.model.getValue(ks.kDegree.M.CostoEnergia)+";CostoDrivers: "+ks.kDegree.M.model.getValue(ks.kDegree.M.CostoDrivers));
+		
 	    System.out.println("Iterazione: " + iteration);
 	    printWriter.println("Iterazione: " + iteration);
 	    List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove = new ArrayList<>();
 
-	    Sol1 = destroySolution(ks, SolCurr, alpha, RS, N, N1HighestDemand, entriesAndValuesToRemove);
+	    
+	    
+	    Sol1 = destroySolution(ks, SolCurr, alpha, RS, N, N1HighestDemand, entriesAndValuesToRemove,resultRoutes);
 	    	
 	    repairSolution(ks, args[0], TR, entriesAndValuesToRemove);
 	    
@@ -4979,9 +5048,9 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	    double r=Math.random();
 	    double p=Math.exp(-deltaZ / T0);
 	    
-	    r=p;
+	    //r=p;   || r < p
 	    // Simulated Annealing Acceptance Criterion
-	    if (deltaZ < 0 || r < p) {
+	    if (deltaZ < 0 ) {
 	        // Accetta la nuova soluzione
 	        SolCurr = Sol1;
 	        Zcurr = Zsol1;
@@ -4990,18 +5059,19 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	            SolBest = Sol1;
 	            Zbest = Zsol1;
 	        }
-	    } else {
-	        annealingUsed = true;
 	    }
+//	     else {
+//	        annealingUsed = true;
+//	    }
 	    
 	    System.out.println("Current Solution: " + SolCurr);
 	    System.out.println("Current Objective Function: " + Zcurr);
 	    printWriter.println("Current Solution: " + SolCurr);
 	    printWriter.println("Current Objective Function: " + Zcurr);
-	    if (annealingUsed) {
-	    	printWriter.println("Annealing used in this iteration");
-	        System.out.println("Annealing used in this iteration");
-	    }
+//	    if (annealingUsed) {
+//	    	printWriter.println("Annealing used in this iteration");
+//	        System.out.println("Annealing used in this iteration");
+//	    }
 
 	    iteration += 1;
 

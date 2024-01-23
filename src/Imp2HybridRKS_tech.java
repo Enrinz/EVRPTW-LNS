@@ -1,14 +1,22 @@
 import ilog.concert.*;
 import ilog.cplex.IloCplex;
 import ilog.cplex.IloCplex.UnknownObjectException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
+
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+class Route {
+    String start;
+    String end;
+    String intermediate;
+
+    Route(String start, String end, String intermediate) {
+        this.start = start;
+        this.end = end;
+        this.intermediate = intermediate;
+    }
+}
 /**
  * Archi tra nodi customer e/o deposito
  */
@@ -729,64 +737,6 @@ public ArrayList<XIndex> getRandomBucket(double factor) {
 }
 
 
-
-
-//Destroy Code:
-//public Map<XIndex, IloNumVar> cRandRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] N) {
-//    // Ensure there are enough nodes in N0
-//    int availableNodes = Math.min(alpha, N.length);
-//
-//    // Create a list of indices for N0
-//    List<Integer> indicesList = new ArrayList<>();
-//    for (int i = 0; i < N.length; i++) {
-//        indicesList.add(i);
-//    }
-//
-//    // Shuffle the list of indices
-//    Random random = new Random();
-//    for (int i = indicesList.size() - 1; i > 0; i--) {
-//        int index = random.nextInt(i + 1);
-//        int temp = indicesList.get(i);
-//        indicesList.set(i, indicesList.get(index));
-//        indicesList.set(index, temp);
-//    }
-//
-//    // Select alpha nodes randomly from N0
-//    node[] nodesToRemove = new node[availableNodes];
-//    for (int i = 0; i < availableNodes; i++) {
-//        nodesToRemove[i] = N[indicesList.get(i)];
-//    }
-//
-//    // Print the selected nodes (optional)
-//    System.out.println("Nodes to be removed randomly:");
-//    for (node removedNode : nodesToRemove) {
-//        System.out.println("Node Removed " + removedNode);
-//        // Add more print statements as needed for other node properties
-//    }
-//
-//    // Collect entries to be removed from the current solution
-//    List<XIndex> entriesToRemove = new ArrayList<>();
-//    for (node removedNode : nodesToRemove) {
-//        for (Map.Entry<XIndex, IloNumVar> entry : currentSolution.entrySet()) {
-//            // Check if the string representation of the node is contained in the entry's value
-//            if (entry.getValue().toString().contains(removedNode.toString())) {
-//                entriesToRemove.add(entry.getKey());
-//                break; // Assuming XIndex is unique, no need to check further entries
-//            }
-//        }
-//    }
-//
-//    // Remove the selected nodes from the current solution
-//    for (XIndex entryToRemove : entriesToRemove) {
-//        currentSolution.remove(entryToRemove);
-//    }
-//
-//    System.out.println("REMOVED: " + entriesToRemove);
-//
-//    // Return the updated solution
-//    return currentSolution;
-//}
-
 public Map<XIndex, IloNumVar> cRandRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] N,List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove) {
     // Ensure there are enough nodes in N0
     int availableNodes = Math.min(alpha, N.length);
@@ -835,68 +785,46 @@ public Map<XIndex, IloNumVar> cRandRemove(Map<XIndex, IloNumVar> currentSolution
         }
     }
 
-//    System.out.println("REMOVED: ");
-//    for (Map.Entry<XIndex, IloNumVar> entryToRemove : entriesAndValuesToRemove) {
-//        System.out.println("Key: " + entryToRemove.getKey() + ", Value: " + entryToRemove.getValue());
-//    }
-
-    // Return the updated solution
     return currentSolution;
 }
-//public Map<XIndex, IloNumVar> sRandRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] RS) {
-//    // Ensure there are enough nodes in N0
-//    int availableNodes = Math.min(alpha, RS.length);
-//
-//    // Create a list of indices for N0
-//    List<Integer> indicesList = new ArrayList<>();
-//    for (int i = 0; i < RS.length; i++) {
-//        indicesList.add(i);
-//    }
-//
-//    // Shuffle the list of indices
-//    Random random = new Random();
-//    for (int i = indicesList.size() - 1; i > 0; i--) {
-//        int index = random.nextInt(i + 1);
-//        int temp = indicesList.get(i);
-//        indicesList.set(i, indicesList.get(index));
-//        indicesList.set(index, temp);
-//    }
-//
-//    // Select alpha nodes randomly from N0
-//    node[] nodesToRemove = new node[availableNodes];
-//    for (int i = 0; i < availableNodes; i++) {
-//        nodesToRemove[i] = RS[indicesList.get(i)];
-//    }
-//
-//    // Print the selected nodes (optional)
-//    System.out.println("Stations to be removed randomly:");
-//    for (node removedNode : nodesToRemove) {
-//        System.out.println("Station Removed " + removedNode);
-//        // Add more print statements as needed for other node properties
-//    }
-//
-//    // Collect entries to be removed from the current solution
-//    List<XIndex> entriesToRemove = new ArrayList<>();
-//    for (node removedNode : nodesToRemove) {
-//        for (Map.Entry<XIndex, IloNumVar> entry : currentSolution.entrySet()) {
-//            // Check if the string representation of the node is contained in the entry's value
-//            if (entry.getValue().toString().contains(removedNode.toString())) {
-//                entriesToRemove.add(entry.getKey());
-//                break; // Assuming XIndex is unique, no need to check further entries
-//            }
-//        }
-//    }
-//
-//    // Remove the selected nodes from the current solution
-//    for (XIndex entryToRemove : entriesToRemove) {
-//        currentSolution.remove(entryToRemove);
-//    }
-//
-//    System.out.println("REMOVED: " + entriesToRemove);
-//
-//    // Return the updated solution
-//    return currentSolution;
-//}
+
+private List<String> findSmallestRoute(List<List<String>> routes) {
+    List<String> smallestRoute = null;
+    int smallestSize = Integer.MAX_VALUE;
+
+    for (List<String> route : routes) {
+        int currentSize = route.size();
+        if (currentSize < smallestSize) {
+            smallestSize = currentSize;
+            smallestRoute = route;
+        }
+    }
+
+    return smallestRoute;
+}
+public Map<XIndex, IloNumVar> cLessCustomers(Map<XIndex, IloNumVar> currentSolution, List<List<String>> resultRoutes) throws UnknownObjectException, IloException {
+    List<String> smallestRoute = findSmallestRoute(resultRoutes);
+
+    // Create a set for efficient lookup
+    Set<String> smallestRouteSet = new HashSet<>(smallestRoute);
+
+    // Create a copy of the original map to avoid concurrent modification exception
+    Map<XIndex, IloNumVar> updatedSolution = new HashMap<>(currentSolution);
+
+    for (Map.Entry<XIndex, IloNumVar> entry : updatedSolution.entrySet()) {
+        XIndex key = entry.getKey();
+        IloNumVar value = entry.getValue();
+
+        // If the key is present in smallestRoute, remove the entry
+        if (smallestRouteSet.contains(key.toString())) {
+            currentSolution.remove(key);
+        }
+    }
+
+    return currentSolution;
+}
+
+
 public Map<XIndex, IloNumVar> sRandRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] RS,List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove) {
     // Ensure there are enough nodes in N0
 	int stations_to_remove=alpha-5;
@@ -946,177 +874,10 @@ public Map<XIndex, IloNumVar> sRandRemove(Map<XIndex, IloNumVar> currentSolution
         }
     }
 
-//    System.out.println("REMOVED: ");
-//    for (Map.Entry<XIndex, IloNumVar> entryToRemove : entriesAndValuesToRemove) {
-//        System.out.println("Key: " + entryToRemove.getKey() + ", Value: " + entryToRemove.getValue());
-//    }
-
-    // Return the updated solution
     return currentSolution;
 }
 
 
-// Define the Destroy function
-//public Map<XIndex, IloNumVar> cRandRemove(Map<XIndex, IloNumVar> currentSolution, int alpha,node[] N0) {
-//    int numNodesToRemove = alpha;
-//    ArrayList<XIndex> nodesToRemove = getRandomNodes(currentSolution, numNodesToRemove);
-//    //System.out.println("Soluzione pre Remove: " + currentSolution);
-//
-//    // Collect entries to be removed
-//    List<XIndex> entriesToRemove = new ArrayList<>();
-//    for (Map.Entry<XIndex, IloNumVar> entry : currentSolution.entrySet()) {
-//        if (nodesToRemove.contains(entry.getKey())) {
-//            entriesToRemove.add(entry.getKey());
-//        }
-//    }
-//
-//    // Remove the selected nodes from the current solution
-//    for (XIndex entryToRemove : entriesToRemove) {
-//        currentSolution.remove(entryToRemove);
-//        
-//    }
-//    
-//    System.out.println("REMOVED: "+entriesToRemove);
-//    
-//    //System.out.println("Soluzione post Remove: " + currentSolution);
-//    return currentSolution;
-//}
-//
-//// Helper function to get a random subset of nodes
-//
-//private ArrayList<XIndex> getRandomNodes(Map<XIndex, IloNumVar> currentSolution, int numNodes) {
-// ArrayList<XIndex> allNodes = new ArrayList<>(currentSolution.keySet());
-// ArrayList<XIndex> randomNodes = new ArrayList<>();
-// Random random = new Random();
-//
-// // Ensure there are enough nodes to select
-// int availableNodes = Math.min(numNodes, allNodes.size());
-//
-// // Randomly select nodes to remove
-// for (int i = 0; i < availableNodes; i++) {
-//     int randomIndex = random.nextInt(allNodes.size());
-//     randomNodes.add(allNodes.get(randomIndex));
-//     allNodes.remove(randomIndex);
-// }
-//
-// return randomNodes;
-//}
-
-//
-//public void cLoadRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] N1HighestDemand) {
-//    // Ensure there are enough nodes to select
-//    int availableNodes = Math.min(alpha, N1HighestDemand.length);
-//
-//    // Select the first alpha nodes based on highest demand
-//    node[] nodesToRemove = Arrays.copyOfRange(N1HighestDemand, 0, availableNodes);
-//
-//    // Print the selected nodes (optional)
-//    System.out.println("Nodes to be removed based on highest demand:");
-//    for (node removedNode : nodesToRemove) {
-//        System.out.println("Node " + removedNode + ": Demand - " + removedNode.getDemand());
-//        // Add more print statements as needed for other node properties
-//    }
-//
-//    // Collect entries to be removed from the current solution
-//    List<String> idsToRemove = Arrays.stream(nodesToRemove)
-//            .map(node::toString)
-//            .collect(Collectors.toList());
-//
-//    // Remove the selected nodes from the current solution
-//    List<XIndex> entriesToRemove = new ArrayList<>();
-//    for (Map.Entry<XIndex, IloNumVar> entry : currentSolution.entrySet()) {
-//        if (idsToRemove.contains(entry.getKey().toString())) {
-//            entriesToRemove.add(entry.getKey());
-//        }
-//    }
-//
-//    // Remove the selected nodes from the current solution
-//    for (XIndex entryToRemove : entriesToRemove) {
-//        currentSolution.remove(entryToRemove);
-//    }
-//    System.out.println("REMOVED: "+entriesToRemove);
-//
-//    // Additional actions if needed
-//    // ...
-//}
-//
-//public Map<XIndex, IloNumVar> cLoadRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] N1HighestDemand) {
-//    // Ensure there are enough nodes to select
-//    int availableNodes = Math.min(alpha, N1HighestDemand.length);
-//
-//    // Select the first alpha nodes based on highest demand
-//    node[] nodesToRemove = Arrays.copyOfRange(N1HighestDemand, 0, availableNodes);
-//
-//    // Print the selected nodes (optional)
-//    System.out.println("Nodes to be removed based on highest demand:");
-//    for (node removedNode : nodesToRemove) {
-//        System.out.println("Node " + removedNode + ": Demand - " + removedNode.getDemand());
-//        
-//        // Add more print statements as needed for other node properties
-//    }
-//    // Collect entries to be removed
-//    List<XIndex> entriesToRemove = new ArrayList<>();
-//    for (Map.Entry<XIndex, IloNumVar> entry : currentSolution.entrySet()) {
-//        if (nodesToRemove.contains(entry.getKey())) {
-//            entriesToRemove.add(entry.getKey());
-//        }
-//    }
-//
-//    // Remove the selected nodes from the current solution
-//    for (XIndex entryToRemove : entriesToRemove) {
-//        currentSolution.remove(entryToRemove);
-//        
-//    }
-//
-//    System.out.println("REMOVED: "+nodesToRemove);
-//
-//    // Additional actions if needed
-//    // ...
-//
-//    // Return the updated solution
-//    return currentSolution;
-//}
-
-// Function to remove the first alpha elements from N1HighestDemand and update the solution
-//public Map<XIndex, IloNumVar> cLoadRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] N1HighestDemand) {
-//    // Ensure there are enough nodes in N1HighestDemand
-//    int availableNodes = Math.min(alpha, N1HighestDemand.length);
-//
-//    // Select the first alpha nodes based on highest demand
-//    node[] nodesToRemove = Arrays.copyOfRange(N1HighestDemand, 0, availableNodes);
-//
-//    // Print the selected nodes (optional)
-//    System.out.println("Nodes to be removed based on highest demand:");
-//    for (node removedNode : nodesToRemove) {
-//        System.out.println("Node " + removedNode + ": Demand - " + removedNode.getDemand());
-//        // Add more print statements as needed for other node properties
-//    }
-//
-//    // Collect entries to be removed from the current solution
-//    List<XIndex> entriesToRemove = new ArrayList<>();
-//    for (node removedNode : nodesToRemove) {
-//        for (Map.Entry<XIndex, IloNumVar> entry : currentSolution.entrySet()) {
-//            // Compare nodes based on their string representation
-//            if (entry.getValue().toString().contains(removedNode.toString())) {
-//                entriesToRemove.add(entry.getKey());
-//                break; // Assuming XIndex is unique, no need to check further entries
-//            }
-//        }
-//    }
-//
-//    // Remove the selected nodes from the current solution
-//    for (XIndex entryToRemove : entriesToRemove) {
-//        currentSolution.remove(entryToRemove);
-//    }
-//
-//    System.out.println("REMOVED: " + entriesToRemove);
-//
-//    // Additional actions if needed
-//    // ...
-//
-//    // Return the updated solution
-//    return currentSolution;
-//}
 public Map<XIndex, IloNumVar> cLoadRemove(Map<XIndex, IloNumVar> currentSolution, int alpha, node[] N1HighestDemand,List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove) {
     // Ensure there are enough nodes in N1HighestDemand
     int availableNodes = Math.min(alpha, N1HighestDemand.length);
@@ -1147,421 +908,8 @@ public Map<XIndex, IloNumVar> cLoadRemove(Map<XIndex, IloNumVar> currentSolution
         }
     }
 
-//    System.out.println("REMOVED: ");
-//    for (Map.Entry<XIndex, IloNumVar> entryToRemove : entriesAndValuesToRemove) {
-//        System.out.println("Key: " + entryToRemove.getKey() + ", Value: " + entryToRemove.getValue());
-//    }
-
-    // Additional actions if needed
-    // ...
-
-    // Return the updated solution
     return currentSolution;
 }
 
-/*
-public void write_ks_output(String args, IloCplex.Status stato) throws FileNotFoundException, IloException {
-	String file_name = args.replace(".txt", "");
-	pr_excel = new PrintStream(new File(file_name + "_excel.csv"));
-	int NumeroSosteRS = 0;
 
-
-	if (z_H < Double.POSITIVE_INFINITY) {
-		double obj = z_H;
-		for (int i = 1; i < M.N.length; i++)
-			obj += M.FD * M.N[i].service_time;
-		pr_excel.println("Obj;"+z_H+";Completo;"+obj+";Seed;"+kDegree.seed);
-		pr_excel.println("vehicle;node;node;ebattery;time;speed;demand;dist;service time;ready;due;b;resbatt;arr time;w");
-		String currNode = "D0";
-		HashMap<String, HashMap<String, Boolean>> xmap = new HashMap<String, HashMap<String, Boolean>>();
-		int xi = 0;
-
-		int Node2Visit = M.N.length - 1;
-		int numeroVeicolo = 0;
-
-		ArrayList<XIndex> local_x_H = new ArrayList<XIndex>(x_best_H);
-		// sino a che non ho visitato tutti i nodi customer
-		while (Node2Visit >= 0) {
-
-			String finalCurrNode = currNode;
-			XIndex currX = local_x_H.stream().filter(el -> el.xi.equals(finalCurrNode)).findFirst().orElse(null);
-			assert currX != null;
-			xi = M.NodeSImap.get(currX.xi);
-			local_x_H.remove(currX);
-
-			// il succ e' customer
-			if (currX.staz.equals("fictius")) {
-				pr_excel.print(numeroVeicolo + ";" + currX.xi + ";" + currX.xj + ";" +
-						e_H.get(currX) + ";" +
-						t_H.get(currX) + ";" +
-						v_H.get(currX) + ";" +
-						M.N[xi].demand + ";" + M.D.get(currX.xi).get(currX.xj) + ";" + M.N[xi].service_time + ";" + M.N[xi].s + ";" + M.N[xi].e + ";0;"
-				);
-				if (!currX.xj.equals("D0"))
-					pr_excel.println(r_H.get(currX.xj) + ";" + a_H.get(currX.xj) + ";" + w_H.get(currX.xj));
-				else
-					pr_excel.println("0;" + a_H.get(currX.xj) + ";0");
-
-				currNode = currX.xj;
-
-				Node2Visit--;
-				if (Node2Visit > 0 && currNode.equals("D0")) {
-					Node2Visit++;
-					numeroVeicolo++;
-				}
-				// c'e' stazione tra i nodi
-			} else {
-				NumeroSosteRS++;
-				pr_excel.print(numeroVeicolo + ";" + currX.xi + ";" + currX.staz + ";" +
-						ea_H.get(currX) + ";" +
-						ta_H.get(currX) + ";" +
-						va_H.get(currX) + ";" +
-						M.N[xi].demand + ";" + M.D.get(currX.xi).get(currX.staz) + ";" +
-						M.N[xi].service_time + ";" + M.N[xi].s + ";" + M.N[xi].e + ";" + b_H.get(currX) + ";"
-				);
-				if (!currX.xj.equals("D0")) {
-					if (!currX.xi.equals("D0"))
-						pr_excel.println(M.gamma + ";" + (a_H.get(currX.xi) + M.N[xi].service_time + w_H.get(currX.xi) +
-								ta_H.get(currX)) +
-								";" + w_H.get(currX.xj));
-					else
-						pr_excel.println(M.gamma + ";" + ta_H.get(currX) +
-								";" + w_H.get(currX.xj));
-				} else
-					pr_excel.println("0;" + a_H.get(currX.xj) + ";0");
-
-				pr_excel.print(numeroVeicolo + ";" + currX.staz + ";" +
-						currX.xj + ";" +
-						eb_H.get(currX) + ";" +
-						tb_H.get(currX) + ";" +
-						vb_H.get(currX) + ";" +
-						M.N[xi].demand + ";" +
-						M.D.get(currX.staz).get(currX.xj) + ";0;0;0;0;");
-				if (!currX.xj.equals("D0"))
-					pr_excel.println(r_H.get(currX.xj) + ";" + a_H.get(currX.xj) + ";" + w_H.get(currX.xj));
-				else
-					pr_excel.println("0;" + a_H.get(currX.xj) + ";0");
-
-				currNode = currX.xj;
-
-				Node2Visit--;
-				if (Node2Visit > 0 && currNode.equals("D0")) {
-					Node2Visit++;
-					numeroVeicolo++;
-				}
-			}
-		}
-
-		try(FileWriter fw = new FileWriter("RiassResults.csv", true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			PrintWriter outpr = new PrintWriter(bw)) {
-			outpr.println(file_name + ";" + stato + ";" + z_H + ";" + (numeroVeicolo+1) + ";" + CostoVeicoli_H + ";" + CostoEnergia_H + ";" +
-					CostoDrivers_H + ";" + timeSoFar + ";" + Gap_H);
-			outpr.close();
-		} catch (IOException e) {
-			System.err.println("Errore scrittura file RiassResult.csv: "+e);
-		}
-
-	} else {
-		pr_excel.println("No solution found");
-	}
-	pr_excel.close();
-
-	PrintStream soste = new PrintStream(new FileOutputStream("Soste.csv", true));
-	soste.println(nomeIstanza+";"+z_H+";"+NumeroSosteRS);
-	soste.close();
-}
-*/
-//
-//public static void main(String[]args) throws IOException, IloException {
-//
-//	InstanceReaderGeneratorTech ir = new InstanceReaderGeneratorTech();
-//	ir.generate(args);
-//	Imp2HybridRKS_tech ks=new Imp2HybridRKS_tech();
-//
-//	if(args.length>=15)
-//		if(args[14].equals("verb"))
-//			ks.verboso = System.out;
-//	//----------------
-//	ks.file_model=args[1];
-//	ks.T_max = Double.parseDouble(args[6]);
-//	ks.limiteT = Integer.parseInt(args[11]);//tempo max iterazione
-//
-//	String name=args[1].replace(".txt", "");
-//	nomeIstanza = name;
-//	System.out.println(name);
-//	ks.pr=new PrintStream(new File(name+"_"+args[15]+"_output_KS.txt"));
-//	pr_out = new PrintStream(new File(name +"_"+args[15]+ "_out.csv")); // args[15] id run
-//	System.out.println("Imp2 RKS");
-//	pr_out.println(" Imp2 RKS");
-//
-//	ks.kDegree=new matheuristic_k_degree_hybridOneGenerator_tech(args); // invoca la cloneless_tech2 !!!!!!!!!!!!!!!!!
-//	ks.kDegree.M.verbCloneless = ks.verboso;
-//	ks.kDegree.M.TempoCPU = System.currentTimeMillis();
-//	ks.kDegree.M.num_veic=Integer.parseInt(args[5]);
-//    int originalNumVeic = ks.kDegree.M.num_veic;
-//	ks.kDegree.M.timeLimit = Double.parseDouble(args[10]);
-//
-//	ks.kDegree.M.R = new	RechargeTypes[ir.Inst.NumTechs];
-//	for (int tec = 0; tec<ir.Inst.NumTechs;tec++){
-//		ks.kDegree.M.R[tec] = new RechargeTypes();
-//		ks.kDegree.M.R[tec].id=Integer.parseInt(ir.Inst.TechId[tec]);
-//		ks.kDegree.M.R[tec].description="Tec_"+tec;
-//		ks.kDegree.M.R[tec].cost = ir.Inst.EnCost[tec];
-//		ks.kDegree.M.R[tec].speed = ir.Inst.RecSpeed[tec];
-//
-//		if(ir.Inst.RecSpeed[tec] < ks.kDegree.M.speed_min)
-//			ks.kDegree.M.speed_min = ir.Inst.RecSpeed[tec];
-//	}
-//
-//	for(Map.Entry<String,ArrayList<String>> StaTec: ir.Inst.RSTech.entrySet())
-//	{
-//		String stat = StaTec.getKey();
-//		ArrayList<RechargeTypes> Rlist = new ArrayList<>();
-//		for (int tec=0;tec<StaTec.getValue().size();tec++) {
-//			String tecId = StaTec.getValue().get(tec);
-//			RechargeTypes Relem = new RechargeTypes();
-//			Relem.id=Integer.parseInt(StaTec.getValue().get(tec));
-//			for (int tt=0;tt<ir.Inst.TechId.length;tt++) {
-//				if (ir.Inst.TechId[tt].equals(tecId)) {
-//					Relem.speed = ir.Inst.RecSpeed[tt];
-//					Relem.cost = ir.Inst.EnCost[tt];
-//					Relem.description = "Tec_" + tt;
-//					Rlist.add(Relem);
-//				}
-//			}
-//		}
-//		ks.kDegree.M.RRT.put(stat,Rlist);
-//	}
-//
-//	//parte della k-degree
-//	int trueNumVeic = ks.kDegree.M.num_veic;
-////	ks.kDegree.M.num_veic = 1; // solo il dep D0
-//	ks.kDegree.M.generate_nodes(ir);
-//	ks.kDegree.M.generate_distances();
-//	ks.kDegree.M.init_parameters(ir);
-//	ks.kDegree.M.compute_S();
-//	ks.kDegree.M.initVariables_Ok();
-//	//----------------------------------------------------------
-//	// considera un solo deposito e non mette limite al numero di veicoli
-//	// annullo variabili con soste a stazioni e che partono o arrivano da dep diversi da D0
-//	/*for(XIndex xind: ks.kDegree.M.Xindici){
-//		if(!xind.staz.equals("fictius")) {
-//			ks.kDegree.M.x.get(xind).setUB(0.0);
-//			ks.kDegree.M.ZeroedXvar.add(xind); // tutte le var con stazioni sono inizialmente fissate a zero
-//		}
-//		else if((xind.xi.startsWith(("D")) && !xind.xi.equals("D0")) || (xind.xj.startsWith(("D")) && !xind.xj.equals("D0")))
-//		{
-//			ks.kDegree.M.x.get(xind).setUB(0.0);
-//			ks.kDegree.M.ZeroedXvar.add(xind);
-//		}
-//	}
-//*/
-//	//----------------------------------------------------------
-//	//ks.kDegree.M.initModelOneVeic(ks.kDegree.M,trueNumVeic); // considera un solo deposito, non mette limite al numero di veicoli e non considera i consumi energetici
-//	ks.kDegree.M.initModel(ks.kDegree.M);
-//	ks.kDegree.feasible_arcs();
-//
-//	ks.finalTimelimit = Integer.parseInt(args[12]); // tempo massimo iterazione finale
-//	ks.limiteTkDeg = Integer.parseInt(args[10]); // tempo massimo kDegree
-//	cloneless_tech.timeLimit = ks.limiteTkDeg;
-//	cloneless_tech.verbCloneless = ks.verboso;
-//
-//	for(String st:ks.kDegree.degree_in.keySet()) {
-//		ks.kDegree.degree_ingoing.put(st, ks.kDegree.degree_in.get(st));
-//	}
-//	for(String st:ks.kDegree.degree_out.keySet()) {
-//		ks.kDegree.degree_outgoing.put(st, ks.kDegree.degree_out.get(st));
-//	}
-//
-//	ks.kDegree.compute_start_ingoing_degree();
-//	ks.kDegree.compute_start_outgoing_degree();
-//
-//	ks.kDegree.probabilities();
-//	ks.kDegree.increasing_degree_ingoing();
-//	ks.kDegree.increasing_degree_outgoing();
-//	ks.kDegree.copy();
-//
-//	System.err.println("k-degree starts");
-//	GlobalStartTime = System.currentTimeMillis();
-//	int usedVehicles = 0;
-//	double time_degree=0;
-//	double bestSoFar = Double.POSITIVE_INFINITY;
-//	int notImprIter = 0 ;
-//	while(!(ks.kDegree.M.model.getStatus().equals(IloCplex.Status.Optimal)||ks.kDegree.M.model.getStatus().equals(IloCplex.Status.Feasible))
-//	      || (time_degree < ks.limiteTkDeg )){
-//
-//		ks.kDegree.random_extract();
-//		/*System.err.println("archi ingoing");
-//		for(String st:ks.kDegree.closest_ingoing.keySet())
-//			for(String st1:ks.kDegree.closest_ingoing.get(st)) {
-//				System.err.println(st+"-->"+st1);
-//			}
-//		System.err.println("archi outgoing");
-//		for(String st:ks.kDegree.closest_outgoing.keySet())
-//			for(String st1:ks.kDegree.closest_outgoing.get(st)) {
-//				System.err.println(st1+"-->"+st);
-//			}*/
-//		ks.kDegree.set_zero_variables_outgoing();
-//
-//		// annullo variabili con stazioni
-//		//ks.kDegree.AzzeraVarX();
-//       // ks.kDegree.M.model.exportModel("mod_kdeg.lp");
-//		//System.out.println("KDeg K': "+ks.kDegree.k_prime);
-//		if(ks.kDegree.M.solve(name+"_output_k_degree_matheuristic"+ks.kDegree.k_prime+".txt")) {
-//
-//			if (ks.kDegree.M.model.getStatus().equals(IloCplex.Status.Infeasible)) {
-//				ks.kDegree.restore_zero_variables_outgoing();
-//				ks.kDegree.reset();
-//				ks.kDegree.copy_opposite();
-//			}
-//			else
-//			{
-//				double Obj = ks.kDegree.M.model.getObjValue();
-//				if(Obj < bestSoFar) {
-//					bestSoFar = Obj;
-//					usedVehicles = ks.kDegree.M.storeSol();
-//					System.out.println("KDeg: "+bestSoFar);
-//				}
-//				else{
-//					if(notImprIter>1){
-//						ks.kDegree.k_prime += 2;
-//						notImprIter=0;
-//					}
-//					else{
-//						notImprIter++;
-//						//System.out.println("KDeg Not Impr "+notImprIter);
-//					}
-//				}
-//			}
-//		}
-//
-//		time_degree = (System.currentTimeMillis() - GlobalStartTime)/1000.0;
-//		if (time_degree >= ks.T_max)
-//			break;
-//		if(time_degree < ks.limiteTkDeg ) {
-//			ks.kDegree.restore_zero_variables_outgoing();
-//			ks.kDegree.reset();
-//			ks.kDegree.copy_opposite();
-//		}
-//	}
-//	if(time_degree >=ks.T_max)
-//		return;
-//
-//	System.err.println("A solution "+ks.kDegree.M.model.getStatus()+" was found with objective "+bestSoFar+ " in "+(time_degree));
-//
-//	ks.generate_KDeg_arcs_xinit();
-//	//usedVehicles = ks.kDegree.M.storeSol();
-//
-//	//fine parte k-Degree
-//	ks.M=ks.kDegree.M;
-//
-//	prRes = new PrintStream(new FileOutputStream("Risultati.csv", true));
-//
-//	if (usedVehicles > 1) // se uso pi� di un veicolo devo aggiungere le copie dei depositi
-//	{
-//		trueNumVeic = usedVehicles;
-//		ks.M.num_veic = trueNumVeic;
-//
-//		System.out.println("usati " + trueNumVeic);
-//		ks.M.model = new IloCplex(); // rigenero il modello cplex
-//
-//		ks.M.add_new_deps(trueNumVeic - 1); // aggiungo a N0 e Dep le copie dei depositi
-//
-//		ks.M.generate_distances(); // rigenero le distanze
-//		ks.M.add_velLimits(ir);
-//		ks.M.compute_S();
-//		ks.M.initVariables_Ok();
-//		ks.M.initModel(ks.M); // ricostruisco tutto il modello
-//	}
-//	else {
-//		// ripristino variabili con soste a stazioni e partenze da D0
-//		for (XIndex xind : ks.M.ZeroedXvar) {
-//			ks.M.x.get(xind).setUB(1.0);
-//		}
-//		// aggiungo i vincoli mancanti
-//		ks.M.add_constraint_4_();
-//		ks.M.add_constraint_17_();
-//		ks.M.add_constraint_18_();
-//		//System.out.println("18 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_19_();
-//		//System.out.println("19 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_20_();
-//		//System.out.println("20 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_21_();
-//		//System.out.println("21 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_22_();
-//		//System.out.println("22 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_23a_();
-//		//System.out.println("23a - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_23b_();
-//		//System.out.println("23b - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		//commentiamo i vincoli 24 perch� doppiano i 26
-//		//add_constraint_24_();
-//		//System.out.println("24 - " + (System.currentTimeMillis() - ks.M.TempoCPU)/1000.0);
-//		ks.M.add_constraint_25ab_();
-//		//System.out.println("25ab - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		//add_constraint_25b_();
-//		//System.out.println("25b - " + (System.currentTimeMillis() - ks.M.TempoCPU)/1000.0);
-//		ks.M.add_constraint_26_();
-//		//System.out.println("26 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//		ks.M.add_constraint_27_();
-//		//System.out.println("27 - " + (System.currentTimeMillis() - ks.M.TempoCPU) / 1000.0);
-//	}
-//
-//	System.out.println("Warm");
-//	ArrayList<IloRange> warmStartConstr = new ArrayList<>();
-//	for(XIndex vx: ks.M.x_init)
-//	{
-//		// Vincoli "warmstart"
-//		//impongo che la sommatoria di x_ijs (incluso l'arco) sia 1 per gli archi (i,j) nella soluzione iniziale
-//		// e se l'arco � (D0, j) o (i, D0) metto nella somma tutte le variabili (D*,j) o (i,D*)
-//		IloLinearNumExpr exp= ks.M.model.linearNumExpr();
-//		if(vx.xi.equals(("D0")))
-//		{
-//			for(Map.Entry<XIndex,IloNumVar> varX: ks.M.x.entrySet())
-//				if(varX.getKey().xi.startsWith("D")  && varX.getKey().xj.equals(vx.xj) ) {
-//					exp.addTerm(1, varX.getValue());
-//				}
-//		}
-//		if( vx.xj.equals("D0"))
-//		{
-//			for(Map.Entry<XIndex,IloNumVar> varX: ks.M.x.entrySet())
-//				if(varX.getKey().xj.startsWith("D")  && varX.getKey().xi.equals(vx.xi) ) {
-//					exp.addTerm(1, varX.getValue());
-//				}
-//		}
-//		if(!vx.xi.equals("D0") && !vx.xj.equals("D0"))  {
-//			for(Map.Entry<XIndex,IloNumVar> varX: ks.M.x.entrySet())
-//				if(varX.getKey().xi.equals(vx.xi) && varX.getKey().xj.equals(vx.xj)){
-//					exp.addTerm(1, varX.getValue());
-//				}
-//		}
-//
-//		warmStartConstr.add( ks.M.model.addEq(exp, 1, "Constr_warmstart_"+vx.xi+"_"+vx.xj));
-//	}
-//
-//	//ks.M.model.exportModel("mod_ws.lp");
-//	ks.M.solve(""); // risolvo il modello imponendo il routing "esteso" della soluzione iniziale
-//	usedVehicles = ks.M.storeSol();
-//
-//	// rimuovo il vincolo di warmstart
-//	for (IloRange constrWS: warmStartConstr) {
-//		ks.M.model.delete(constrWS);
-//	}
-//
-//	// creo il warm start vero per cplex
-//	ks.M.setWarmStart(usedVehicles);
-//
-//	System.out.println("RKS Starts");
-//	IloCplex.Status stato= ks.RandKernSearchKDegree();
-//
-//	stato=ks.FinalIteration(args[15]);
-//
-//	prRes.close();
-//	pr_out.close();
-//
-//	return;
-//}
-//
 }
