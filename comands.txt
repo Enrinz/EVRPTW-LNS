@@ -8,6 +8,20 @@ Make Jar: vai nella cartella bin
 premi su file->export->Java->Runnable jar file->.jar->finish
 
 
+RUN macchina last:
+
+java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio201\cplex\lib\cplex.jar";ClonelessTech1.jar cloneless_tech2 SGS r103_21_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 12 16 1234 100 30 60 kdeg 300 0.3 3600 120
+
+
+RUN locale LAST:
+	
+java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar";ClonelessTech1.jar cloneless_tech2 SGS r103_21_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg 300 0.3 3600 100
+	
+
+
+
+
+
 RUN: (in C:\Users\enrin\Desktop\EVR)
 
 java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar";ClonelessTech1.jar cloneless_tech2 SGS r103_21_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 12 12 1234 60 300 0.3 1000 100
@@ -19,10 +33,6 @@ java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar"
 
 	
 			
-	RUN 10 semi LAST:
-	
-java -classpath "C:\Program Files\IBM\ILOG\CPLEX_Studio2211\cplex\lib\cplex.jar";ClonelessTech1.jar cloneless_tech2 SGS r103_21_25.txt TechStations.txt ParametriEV_new_1.txt Outer_01.txt 15 14400 24 8 1234 60 30 60 kdeg 300 0.3 3600 100
-	
 
 	
 	

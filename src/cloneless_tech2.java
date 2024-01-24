@@ -4685,7 +4685,7 @@ public static node[] sortNodesByDemandDescending(node[] originalNodes) {
 }
 private static Map<XIndex, IloNumVar> destroySolution(Imp2HybridRKS_tech ks, Map<XIndex, IloNumVar> SolCurr, int alpha, node[] RS, node[] N,  node[] N1HighestDemand, List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove,List<List<String>> resultRoutes) throws UnknownObjectException, IloException {
     // Randomly pick a move among sRandRemove, cRandRemove, cLoadRemove
-    String[] moves = { "cRandRemove", "cLoadRemove","cLessCustomers"}; //"sRandRemove",
+    String[] moves = { "cRandRemove", "cLoadRemove","sRandRemove"}; //"cLessCustomers",
     String selectedMove = moves[new Random().nextInt(moves.length)];
 
     // Assign the selected move to Sol1
@@ -4751,14 +4751,22 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 
     // Aggiungere il primo numero "1234"
     seeds.add(Long.parseLong(args[9]));
-    
+    seeds.add(Long.parseLong("4761"));
+    seeds.add(Long.parseLong("3565"));
+    seeds.add(Long.parseLong("2690"));
+    seeds.add(Long.parseLong("1975"));
+    seeds.add(Long.parseLong("9121"));
+    seeds.add(Long.parseLong("4007"));
+    seeds.add(Long.parseLong("4101"));
+    seeds.add(Long.parseLong("7058"));
+    seeds.add(Long.parseLong("3842"));
     // Aggiungere altri 9 numeri casuali positivi
-    Random random = new Random();
-    for (int i = 0; i < 9; i++) {
-        long numeroCasuale = random.nextInt(9000) + 1000; // Genera un numero casuale positivo con un massimo di 4 cifre
-        seeds.add(numeroCasuale);
-    }
-    
+//    Random random = new Random();
+//    for (int i = 0; i < 9; i++) {
+//        long numeroCasuale = random.nextInt(9000) + 1000; // Genera un numero casuale positivo con un massimo di 4 cifre
+//        seeds.add(numeroCasuale);
+//    }
+//    
     int run=1;
     
     //10 RUNS
