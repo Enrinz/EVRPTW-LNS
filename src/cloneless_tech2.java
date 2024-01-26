@@ -4685,7 +4685,7 @@ public static node[] sortNodesByDemandDescending(node[] originalNodes) {
 }
 private static Map<XIndex, IloNumVar> destroySolution(Imp2HybridRKS_tech ks, Map<XIndex, IloNumVar> SolCurr, int alpha, node[] RS, node[] N,  node[] N1HighestDemand, List<Map.Entry<XIndex, IloNumVar>> entriesAndValuesToRemove,List<List<String>> resultRoutes) throws UnknownObjectException, IloException {
     // Randomly pick a move among sRandRemove, cRandRemove, cLoadRemove
-    String[] moves = { "cRandRemove", "cLoadRemove","sRandRemove"}; //"cLessCustomers",
+    String[] moves = { "cRandRemove", "cLoadRemove","cLessCustomers"}; //"sRandRemove",
     String selectedMove = moves[new Random().nextInt(moves.length)];
 
     // Assign the selected move to Sol1
@@ -4751,14 +4751,14 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 
     // Aggiungere il primo numero "1234"
     seeds.add(Long.parseLong(args[9]));
-    seeds.add(Long.parseLong("4761"));
-    seeds.add(Long.parseLong("3565"));
-    seeds.add(Long.parseLong("2690"));
-    seeds.add(Long.parseLong("1975"));
-    seeds.add(Long.parseLong("9121"));
-    seeds.add(Long.parseLong("4007"));
-    seeds.add(Long.parseLong("4101"));
-    seeds.add(Long.parseLong("7058"));
+//    seeds.add(Long.parseLong("4761"));
+//    seeds.add(Long.parseLong("3565"));
+//    seeds.add(Long.parseLong("2690"));
+//    seeds.add(Long.parseLong("1975"));
+//    seeds.add(Long.parseLong("9121"));
+//    seeds.add(Long.parseLong("4007"));
+//    seeds.add(Long.parseLong("4101"));
+//    seeds.add(Long.parseLong("7058"));
     seeds.add(Long.parseLong("3842"));
     // Aggiungere altri 9 numeri casuali positivi
 //    Random random = new Random();
@@ -4825,10 +4825,23 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	ks.kDegree=new matheuristic_k_degree_hybridOneGenerator_tech(args,seed); // invoca la cloneless_tech2 !!!!!!!!!!!!!!!!!
 	ks.kDegree.M.verbCloneless = ks.verboso;
 	ks.kDegree.M.TempoCPU = System.currentTimeMillis();
-	ks.kDegree.M.num_veic=Integer.parseInt(args[5]);
+	
+	
+//	ks.kDegree.M.num_veic=Integer.parseInt(args[5]);
+//	
+//
+//	
+//	int originalNumVeic = ks.kDegree.M.num_veic;
+//	
+	
+	ks.kDegree.M.num_veic=2;
 	int originalNumVeic = ks.kDegree.M.num_veic;
+	System.out.println("Numero veicoli: "+ks.kDegree.M.num_veic);
 	ks.kDegree.M.timeLimit = Double.parseDouble(args[10]);
 
+	
+	
+	
 	
 	ks.kDegree.M.R = new RechargeTypes[ir.Inst.NumTechs];
 	for (int tec = 0; tec<ir.Inst.NumTechs;tec++){
@@ -4952,9 +4965,26 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	ks.kDegree.M.solve(name+"_output_k_degree_matheuristic"+ks.kDegree.k_prime+".txt");
 
 	System.out.println("Solution Status:"+ks.kDegree.M.model.getStatus());
+
 	printWriter.println("Solution Status:"+ks.kDegree.M.model.getStatus());
 	
+	
+	
+	// Ottieni lo stato della soluzione
+	IloCplex.Status status = ks.kDegree.M.model.getStatus();
+	
+	// Verifica se lo stato è "Feasible"
+	if (status == IloCplex.Status.Feasible) {
+	    // Se lo stato è "Feasible", esegui il codice desiderato qui
+	    System.out.println("La soluzione è Feasible. Continua...");
 
+	    // Altre istruzioni se necessario...
+
+	} else {
+	    // Se lo stato non è "Feasible", puoi fare qualcos'altro o ricominciare il ciclo
+	    System.out.println("Lo stato della soluzione non è 'Feasible'. Riparti il ciclo o gestisci diversamente.");
+	    // Altre istruzioni se necessario...
+	}
 	
 
 	Map<XIndex, IloNumVar> SolCurr = new HashMap<>();
@@ -5007,13 +5037,16 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	System.out.println("Initial Solution: "+SolCurr+" Initial Objective Function: "+Zcurr);
 	printWriter.println("Initial Solution: "+SolCurr+" Initial Objective Function: "+Zcurr);
 	
+	
+	
 	//START LNS
 	long startTime = System.currentTimeMillis();
 	long totalTimeLimit = (long) ((TT-Tini)*1000); 
 	
 	
+	
 
-
+	
 	//if(!init)
 
 	while (System.currentTimeMillis() - startTime < totalTimeLimit) {
