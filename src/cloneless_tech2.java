@@ -4827,16 +4827,16 @@ public static void main(String[] args) throws  IOException, IloException, Interr
 	ks.kDegree.M.TempoCPU = System.currentTimeMillis();
 	
 	
-//	ks.kDegree.M.num_veic=Integer.parseInt(args[5]);
-//	
-//
-//	
-//	int originalNumVeic = ks.kDegree.M.num_veic;
-//	
+	ks.kDegree.M.num_veic=Integer.parseInt(args[5]);
 	
-	ks.kDegree.M.num_veic=2;
+
+	
 	int originalNumVeic = ks.kDegree.M.num_veic;
-	System.out.println("Numero veicoli: "+ks.kDegree.M.num_veic);
+	
+//	
+//	ks.kDegree.M.num_veic=2;
+//	int originalNumVeic = ks.kDegree.M.num_veic;
+//	System.out.println("Numero veicoli: "+ks.kDegree.M.num_veic);
 	ks.kDegree.M.timeLimit = Double.parseDouble(args[10]);
 
 	
